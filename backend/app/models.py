@@ -1,0 +1,41 @@
+from sqlalchemy import Column, Enum, Integer, String, Float, Date, DateTime, Text, func
+from .database import Base
+from datetime import datetime, timezone
+
+GENDER_CHOICES = ["male", "female", "intersex", "other", "unknown"]
+
+
+class Case(Base):
+    __tablename__ = "cases"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True),
+                        server_default=func.now(), onupdate=func.now())
+    last_modified_by = Column(String, nullable=True)
+
+    age = Column(Integer)
+    gender = Column(Enum(*GENDER_CHOICES, name="gender_type"))
+    medical_history = Column(Text, nullable=True)
+
+    isolation_site = Column(String)
+    date_of_isolation = Column(Date)
+    city = Column(String)
+    state = Column(String)
+    travel_history = Column(Text, nullable=True)
+
+    clade = Column(String)  # Clade I, Clade III, etc.
+    clade_region = Column(String)  # South Asian, African, etc.
+    # Relation to other cases (not in our db, i think. zB: "Relationship to isolates from Rhodes (RHO1-4) confirmed" )
+    relation_to = Column(String, nullable=True)
+
+    # Resistance Data (MIC values in mg/L)
+    mic_and = Column(Float, nullable=True)  # Anidulafungin
+    mic_mic = Column(Float, nullable=True)  # Micafungin
+    mic_cas = Column(Float, nullable=True)  # Caspofungin
+    mic_flc = Column(Float, nullable=True)  # Fluconazole
+    mic_pos = Column(Float, nullable=True)  # Posaconazole
+    mic_vor = Column(Float, nullable=True)  # Voriconazole
+    mic_5fc = Column(Float, nullable=True)  # 5-Flucytosine
+    mic_amb = Column(Float, nullable=True)  # Amphotericin B
+    mic_mgx = Column(Float, nullable=True)  # Manogepix

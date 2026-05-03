@@ -54,7 +54,7 @@ def home():
     return {"message": "C. auris API is running"}
 
 
-@app.get("/api/cases")
+@app.get("/api/admin/cases")
 def get_all_cases(db: Session = Depends(get_db)):
     cases = db.query(models.Case).order_by(models.Case.id).all()
     return cases
@@ -132,6 +132,55 @@ async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTa
     }
 
 
-@app.get("/api/submissions")
+@app.get("/api/admin/submissions")
 async def get_submissions():
     return submitted_cases
+
+
+@app.post("/api/admin/approve-submission/{index}")
+def approve_submission(index: int, db: Session = Depends(get_db)):
+    if index < 0 or index >= len(submitted_cases):
+        raise HTTPException(status_code=404, detail="Submission not found")
+
+    raw_data = submitted_cases[index]
+
+    try:
+        new_case = models.Case(
+            age=raw_data['age'],
+            gender=raw_data['gender'],
+            medical_history=raw_data.get('medical_history'),
+            isolation_site=raw_data['isolation_site'],
+            date_of_isolation=raw_data['date_of_isolation'],
+            city=raw_data['city'],
+            state=raw_data['state'],
+            clade=raw_data.get('clade'),
+            clade_region=raw_data.get('clade_region'),
+            travel_history=raw_data.get('travel_history'),
+            relation_to=raw_data.get('relation_to'),
+            mic_and=raw_data.get('mic_and'),
+            mic_mic=raw_data.get('mic_mic'),
+            mic_cas=raw_data.get('mic_cas'),
+            mic_flc=raw_data.get('mic_flc'),
+            mic_pos=raw_data.get('mic_pos'),
+            mic_vor=raw_data.get('mic_vor'),
+            mic_5fc=raw_data.get('mic_5fc'),
+            mic_amb=raw_data.get('mic_amb'),
+            mic_mgx=raw_data.get('mic_mgx')
+
+        )
+
+        db.add(new_case)
+        db.commit()
+        db.refresh(new_case)
+
+        # Remove from the temporary list
+        submitted_cases.pop(index)
+
+        return {
+            "message": "Submission moved to database successfully",
+            "db_id": new_case.id
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"Approval failed: {str(e)}")

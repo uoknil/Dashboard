@@ -63,3 +63,21 @@ def get_stats_by_clade(db: Session = Depends(get_db)):
     results = db.query(models.Case.clade, func.count(
         models.Case.id)).group_by(models.Case.clade).all()
     return {clade: count for clade, count in results}
+
+
+# Returns the number of cases reported each year, e.g., {"2023": 2, "2024": 6, ...}
+@app.get("/api/stats/by-year")
+def get_timeline(db: Session = Depends(get_db)):
+    results = db.query(
+        func.extract('year', models.Case.date_of_isolation).label('year'),
+        func.count(models.Case.id)
+    ).group_by('year').order_by('year').all()
+
+    return {int(year): count for year, count in results}
+
+
+# returs the date of the most recently added case report
+@app.get("/api/meta/last-updated")
+def get_last_updated(db: Session = Depends(get_db)):
+    last_entry = db.query(func.max(models.Case.created_at)).scalar()
+    return {"last_updated": last_entry.date() if last_entry else None}

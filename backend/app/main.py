@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends
+import os
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from .database import engine, SessionLocal, Base
-from . import models
+from . import models, schemas
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -24,6 +26,21 @@ app.add_middleware(
 )
 
 
+conf = ConnectionConfig(
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+    MAIL_FROM=os.getenv("MAIL_FROM"),
+    MAIL_PORT=int(os.getenv("MAIL_PORT", 587)),
+    MAIL_SERVER=os.getenv("MAIL_SERVER"),
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True
+)
+
+submitted_cases = []
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -39,7 +56,7 @@ def home():
 
 @app.get("/api/cases")
 def get_all_cases(db: Session = Depends(get_db)):
-    cases = db.query(models.Case).all()
+    cases = db.query(models.Case).order_by(models.Case.id).all()
     return cases
 
 
@@ -81,3 +98,40 @@ def get_timeline(db: Session = Depends(get_db)):
 def get_last_updated(db: Session = Depends(get_db)):
     last_entry = db.query(func.max(models.Case.created_at)).scalar()
     return {"last_updated": last_entry.date() if last_entry else None}
+
+
+@app.post("/api/report-case")
+async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTasks):
+    report_dict = report.model_dump()
+    submitted_cases.append(report_dict)
+
+    # Dynamically build a list of all fields for the email
+    details_html = "".join([f"<li><b>{k.replace('_', ' ').title()}:</b> {v}</li>"
+                            for k, v in report_dict.items() if v is not None])
+
+    html = f"""
+    <h3>New Candida auris Case Reported</h3>
+    <ul>{details_html}</ul>
+    <hr>
+    <p><i>Check the admin dashboard to approve this submission.</i></p>
+    """
+
+    message = MessageSchema(
+        subject=f"New Case Submission: {report.city}",
+        recipients=[os.getenv("MAIL_FROM")],
+        body=html,
+        subtype=MessageType.html
+    )
+
+    fm = FastMail(conf)
+    background_tasks.add_task(fm.send_message, message)
+
+    return {
+        "status": "success",
+        "submission_index": len(submitted_cases) - 1
+    }
+
+
+@app.get("/api/submissions")
+async def get_submissions():
+    return submitted_cases

@@ -41,3 +41,25 @@ def home():
 def get_all_cases(db: Session = Depends(get_db)):
     cases = db.query(models.Case).all()
     return cases
+
+
+@app.get("/api/stats/by-state")
+def get_stats_by_state(db: Session = Depends(get_db)):
+    results = db.query(models.Case.state, func.count(
+        models.Case.id)).group_by(models.Case.state).all()
+    # Format: {"Vienna": 10, "Styria": 1, ...}
+    return {state: count for state, count in results}
+
+
+@app.get("/api/stats/by-site")
+def get_stats_by_site(db: Session = Depends(get_db)):
+    results = db.query(models.Case.isolation_site, func.count(
+        models.Case.id)).group_by(models.Case.isolation_site).all()
+    return {site: count for site, count in results}
+
+
+@app.get("/api/stats/by-clade")
+def get_stats_by_clade(db: Session = Depends(get_db)):
+    results = db.query(models.Case.clade, func.count(
+        models.Case.id)).group_by(models.Case.clade).all()
+    return {clade: count for clade, count in results}

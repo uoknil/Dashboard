@@ -186,3 +186,15 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(
             status_code=500, detail=f"Approval failed: {str(e)}")
+
+
+@app.delete("/api/admin/submissions/{submission_id}")
+def reject_submission(submission_id: int, db: Session = Depends(get_db)):
+    submission = db.query(models.Submission).filter(
+        models.Submission.id == submission_id
+    ).first()
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    db.delete(submission)
+    db.commit()
+    return {"message": "Submission rejected and deleted"}

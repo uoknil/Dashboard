@@ -93,7 +93,7 @@ def get_timeline(db: Session = Depends(get_db)):
     return {int(year): count for year, count in results}
 
 
-# returs the date of the most recently added case report
+# returns the date of the most recently added case report
 @app.get("/api/meta/last-updated")
 def get_last_updated(db: Session = Depends(get_db)):
     last_entry = db.query(func.max(models.Case.created_at)).scalar()

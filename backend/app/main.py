@@ -38,8 +38,6 @@ conf = ConnectionConfig(
     VALIDATE_CERTS=True
 )
 
-submitted_cases = []
-
 
 def get_db():
     db = SessionLocal()
@@ -100,11 +98,17 @@ def get_last_updated(db: Session = Depends(get_db)):
     return {"last_updated": last_entry.date() if last_entry else None}
 
 
-@app.post("/api/report-case")
-async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTasks):
+@app.post("/api/report-case", status_code=201)
+async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     report_dict = report.model_dump()
-    submitted_cases.append(report_dict)
 
+    # save the submission to the database submission table.
+    new_submission = models.Submission(**report.model_dump())
+    db.add(new_submission)
+    db.commit()
+    db.refresh(new_submission)
+
+    report_dict = report.model_dump()
     # Dynamically build a list of all fields for the email
     details_html = "".join([f"<li><b>{k.replace('_', ' ').title()}:</b> {v}</li>"
                             for k, v in report_dict.items() if v is not None])
@@ -128,7 +132,7 @@ async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTa
 
     return {
         "status": "success",
-        "submission_index": len(submitted_cases) - 1
+        "submission_id": new_submission.id
     }
 
 

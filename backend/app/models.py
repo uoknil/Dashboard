@@ -39,3 +39,32 @@ class Case(Base):
     mic_5fc = Column(Float, nullable=True)  # 5-Flucytosine
     mic_amb = Column(Float, nullable=True)  # Amphotericin B
     mic_mgx = Column(Float, nullable=True)  # Manogepix
+
+
+class Submission(Base):
+    __tablename__ = "submissions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    submitted_at = Column(DateTime(timezone=True), server_default=func.now())
+    reporter_email = Column(String, nullable=False)
+
+    age = Column(Integer, nullable=True)
+    gender = Column(Enum(*GENDER_CHOICES, name="gender_type"), nullable=True)
+    medical_history = Column(Text, nullable=True)
+    isolation_site = Column(String, nullable=True)
+    date_of_isolation = Column(Date, nullable=True)
+    city = Column(String, nullable=True)
+    state = Column(String, nullable=True)
+    travel_history = Column(Text, nullable=True)
+    clade = Column(String, nullable=True)
+    clade_region = Column(String, nullable=True)
+    relation_to = Column(String, nullable=True)
+    mic_and = Column(Float, nullable=True)
+    mic_mic = Column(Float, nullable=True)
+    mic_cas = Column(Float, nullable=True)
+    mic_flc = Column(Float, nullable=True)
+    mic_pos = Column(Float, nullable=True)
+    mic_vor = Column(Float, nullable=True)
+    mic_5fc = Column(Float, nullable=True)
+    mic_amb = Column(Float, nullable=True)
+    mic_mgx = Column(Float, nullable=True)

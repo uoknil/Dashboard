@@ -1,11 +1,13 @@
 import os
-from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from .database import engine, SessionLocal, Base
+from .database import engine, SessionLocal, Base, get_db
 from . import models, schemas
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
+from fastapi.security import OAuth2PasswordRequestForm
+from . import auth
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -39,21 +41,13 @@ conf = ConnectionConfig(
 )
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 @app.get("/")
 def home():
     return {"message": "C. auris API is running"}
 
 
 @app.get("/api/admin/cases")
-def get_all_cases(db: Session = Depends(get_db)):
+def get_all_cases(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     cases = db.query(models.Case).order_by(models.Case.id).all()
     return cases
 
@@ -100,7 +94,6 @@ def get_last_updated(db: Session = Depends(get_db)):
 
 @app.post("/api/report-case", status_code=201)
 async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-    report_dict = report.model_dump()
 
     # save the submission to the database submission table.
     new_submission = models.Submission(**report.model_dump())
@@ -137,12 +130,12 @@ async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTa
 
 
 @app.get("/api/admin/submissions")
-def get_submissions(db: Session = Depends(get_db)):
+def get_submissions(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     return db.query(models.Submission).order_by(models.Submission.submitted_at.desc()).all()
 
 
 @app.post("/api/admin/approve-submission/{submission_id}")
-def approve_submission(submission_id: int, db: Session = Depends(get_db)):
+def approve_submission(submission_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     submission = db.query(models.Submission).filter(
         models.Submission.id == submission_id).first()
     if not submission:
@@ -189,7 +182,7 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db)):
 
 
 @app.delete("/api/admin/submissions/{submission_id}")
-def reject_submission(submission_id: int, db: Session = Depends(get_db)):
+def reject_submission(submission_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     submission = db.query(models.Submission).filter(
         models.Submission.id == submission_id
     ).first()
@@ -198,3 +191,18 @@ def reject_submission(submission_id: int, db: Session = Depends(get_db)):
     db.delete(submission)
     db.commit()
     return {"message": "Submission rejected and deleted"}
+
+
+@app.post("/api/auth/login", response_model=schemas.Token)
+def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
+    user = db.query(models.User).filter(
+        models.User.username == form_data.username).first()
+    if not user or not auth.verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token = auth.create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}

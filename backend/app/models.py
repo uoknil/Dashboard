@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Enum, Integer, String, Float, Date, DateTime, Text, func
+from sqlalchemy import Column, Enum, Integer, String, Float, Date, DateTime, Text, func, Boolean
 from .database import Base
 from datetime import datetime, timezone
 
@@ -68,3 +68,13 @@ class Submission(Base):
     mic_5fc = Column(Float, nullable=True)
     mic_amb = Column(Float, nullable=True)
     mic_mgx = Column(Float, nullable=True)
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

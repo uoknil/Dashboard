@@ -8,6 +8,7 @@ from . import models, schemas
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from fastapi.security import OAuth2PasswordRequestForm
 from . import auth
+from .utils import get_region_from_clade
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -44,12 +45,6 @@ conf = ConnectionConfig(
 @app.get("/")
 def home():
     return {"message": "C. auris API is running"}
-
-
-@app.get("/api/admin/cases")
-def get_all_cases(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-    cases = db.query(models.Case).order_by(models.Case.id).all()
-    return cases
 
 
 @app.get("/api/stats/by-state")
@@ -129,6 +124,12 @@ async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTa
     }
 
 
+@app.get("/api/admin/cases")
+def get_all_cases(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    cases = db.query(models.Case).order_by(models.Case.id).all()
+    return cases
+
+
 @app.get("/api/admin/submissions")
 def get_submissions(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
     return db.query(models.Submission).order_by(models.Submission.submitted_at.desc()).all()
@@ -142,6 +143,8 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db), curren
         raise HTTPException(status_code=404, detail="Submission not found")
 
     try:
+        automated_region = get_region_from_clade(submission.clade)
+
         new_case = models.Case(
             age=submission.age,
             gender=submission.gender,
@@ -151,7 +154,7 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db), curren
             city=submission.city,
             state=submission.state,
             clade=submission.clade,
-            clade_region=submission.clade_region,
+            clade_region=automated_region,
             travel_history=submission.travel_history,
             relation_to=submission.relation_to,
             mic_and=submission.mic_and,
@@ -167,7 +170,7 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db), curren
         )
 
         db.add(new_case)
-        db.delete(submission)  # Remove the submission after approval
+        db.delete(submission)
         db.commit()
         db.refresh(new_case)
 
@@ -206,3 +209,74 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
 
     access_token = auth.create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.patch("/api/admin/cases/{case_id}")
+def update_case(
+    case_id: int,
+    obj_in: schemas.CaseUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    case = db.query(models.Case).filter(models.Case.id == case_id).first()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    # Only fields provided in request
+    update_data = obj_in.model_dump(exclude_unset=True)
+
+    # Logic for Clade Region Automation
+    if "clade" in update_data:
+        update_data["clade_region"] = get_region_from_clade(
+            update_data["clade"])
+
+    for field in update_data:
+        setattr(case, field, update_data[field])
+
+    case.last_modified_by = current_user.username
+
+    db.commit()
+    db.refresh(case)
+    return case
+
+
+@app.delete("/api/admin/cases/{case_id}")
+def delete_case(
+    case_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    case = db.query(models.Case).filter(models.Case.id == case_id).first()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    db.delete(case)
+    db.commit()
+    return {"message": "Case permanently deleted"}
+
+
+@app.patch("/api/admin/submissions/{submission_id}")
+def update_submission(
+    submission_id: int,
+    obj_in: schemas.SubmissionUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    submission = db.query(models.Submission).filter(
+        models.Submission.id == submission_id).first()
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+
+    update_data = obj_in.model_dump(exclude_unset=True)
+
+    # Logic for Clade Region Automation
+    if "clade" in update_data:
+        # If clade is provided, update region. If clade is None, region becomes "Unknown"
+        update_data["clade_region"] = get_region_from_clade(
+            update_data["clade"]) if update_data["clade"] else "Unknown"
+
+    for field in update_data:
+        setattr(submission, field, update_data[field])
+
+    db.commit()
+    db.refresh(submission)
+    return submission

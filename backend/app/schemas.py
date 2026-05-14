@@ -57,3 +57,43 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CaseUpdate(BaseModel):
+    age: Optional[int] = None
+    gender: Optional[GenderType] = None
+    medical_history: Optional[str] = None
+    isolation_site: Optional[str] = None
+    date_of_isolation: Optional[date] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    clade: Optional[str] = None
+    mic_and: Optional[float] = None
+    mic_mic: Optional[float] = None
+    mic_cas: Optional[float] = None
+    mic_flc: Optional[float] = None
+    mic_pos: Optional[float] = None
+    mic_vor: Optional[float] = None
+    mic_5fc: Optional[float] = None
+    mic_amb: Optional[float] = None
+    mic_mgx: Optional[float] = None
+
+
+class SubmissionUpdate(BaseModel):
+    age: Optional[int] = None
+    gender: Optional[GenderType] = None
+    medical_history: Optional[str] = None
+    isolation_site: Optional[str] = None
+    date_of_isolation: Optional[date] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    clade: Optional[str] = None
+    mic_and: Optional[float] = None
+    mic_mic: Optional[float] = None
+    mic_cas: Optional[float] = None
+    mic_flc: Optional[float] = None
+    mic_pos: Optional[float] = None
+    mic_vor: Optional[float] = None
+    mic_5fc: Optional[float] = None
+    mic_amb: Optional[float] = None
+    mic_mgx: Optional[float] = None

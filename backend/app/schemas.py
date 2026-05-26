@@ -1,8 +1,10 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_validator
 from typing import Optional, Literal
 from datetime import date
 
 GenderType = Literal["male", "female", "intersex", "other", "unknown"]
+InfectionType = Literal["infection", "colonization", "unknown"]
+ImmuneStatus = Literal["immunocompetent", "immunocompromised", "unknown"]
 
 
 class CaseReport(BaseModel):
@@ -12,18 +14,29 @@ class CaseReport(BaseModel):
     age: Optional[int] = Field(None, gt=0, lt=120)
     gender: GenderType
     # reason for visit, i guess? or maybe "comorbidities" or "underlying conditions"?
-    medical_history: Optional[str] = None
+    medical_history: str = Field(..., min_length=1)
 
     isolation_site: str = Field(..., min_length=1)
     date_of_isolation: date
     city: str = Field(..., min_length=1)
     state: str = Field(..., min_length=1)
 
-    travel_history: Optional[str] = None
+    hospitalized_abroad: Optional[bool] = None
+    hospital_name: Optional[str] = None
+    travel_history: str = Field(..., min_length=1)
     relation_to: Optional[str] = None
 
+    infection_type: InfectionType
+    immune_status: Optional[ImmuneStatus] = None
+
+    antifungal_therapy: Optional[bool] = None
+    antifungal_therapy_details: Optional[str] = None
+
+    topical_therapy: Optional[bool] = None
+    topical_therapy_details: Optional[str] = None
+
     # e.g., CLade I, Clade II, Clade III, Clade IV, etc.
-    clade: Optional[str] = None
+    # clade: Optional[str] = None
     # e.g., "South Asian", "African" "South American", etc.
     # clade_region: Optional[str] = "Unknown" # i am not sure we should have this fiels in the formular.
 
@@ -36,6 +49,22 @@ class CaseReport(BaseModel):
     mic_5fc: Optional[float] = Field(None, ge=0)  # 5-Flucytosine
     mic_amb: Optional[float] = Field(None, ge=0)  # Amphotericin B
     mic_mgx: Optional[float] = Field(None, ge=0)  # Manogepix
+
+    @model_validator(mode="after")
+    def check_conditional_details(self) -> "CaseReport":
+        if self.hospitalized_abroad and not (self.hospital_name and self.hospital_name.strip()):
+            raise ValueError(
+                "Hospital name is required if hospitalized abroad is true.")
+
+        if self.antifungal_therapy and not (self.antifungal_therapy_details and self.antifungal_therapy_details.strip()):
+            raise ValueError(
+                "Antifungal therapy details are required if antifungal therapy is true.")
+
+        if self.topical_therapy and not (self.topical_therapy_details and self.topical_therapy_details.strip()):
+            raise ValueError(
+                "Topical therapy details are required if topical therapy is true.")
+
+        return self
 
     class Config:
         from_attributes = True
@@ -68,6 +97,21 @@ class CaseUpdate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     clade: Optional[str] = None
+    clade_region: Optional[str] = None
+    hospitalized_abroad: Optional[bool] = None
+    hospital_name: Optional[str] = None
+    travel_history: Optional[str] = None
+    relation_to: Optional[str] = None
+
+    infection_type: Optional[InfectionType] = None
+    immune_status: Optional[ImmuneStatus] = None
+
+    antifungal_therapy: Optional[bool] = None
+    antifungal_therapy_details: Optional[str] = None
+
+    topical_therapy: Optional[bool] = None
+    topical_therapy_details: Optional[str] = None
+
     mic_and: Optional[float] = None
     mic_mic: Optional[float] = None
     mic_cas: Optional[float] = None
@@ -88,6 +132,21 @@ class SubmissionUpdate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     clade: Optional[str] = None
+    clade_region: Optional[str] = None
+    hospitalized_abroad: Optional[bool] = None
+    hospital_name: Optional[str] = None
+    travel_history: Optional[str] = None
+    relation_to: Optional[str] = None
+
+    infection_type: Optional[InfectionType] = None
+    immune_status: Optional[ImmuneStatus] = None
+
+    antifungal_therapy: Optional[bool] = None
+    antifungal_therapy_details: Optional[str] = None
+
+    topical_therapy: Optional[bool] = None
+    topical_therapy_details: Optional[str] = None
+
     mic_and: Optional[float] = None
     mic_mic: Optional[float] = None
     mic_cas: Optional[float] = None
@@ -97,3 +156,6 @@ class SubmissionUpdate(BaseModel):
     mic_5fc: Optional[float] = None
     mic_amb: Optional[float] = None
     mic_mgx: Optional[float] = None
+
+    class Config:
+        from_attributes = True

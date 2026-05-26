@@ -3,6 +3,8 @@ from .database import Base
 from datetime import datetime, timezone
 
 GENDER_CHOICES = ["male", "female", "intersex", "other", "unknown"]
+INFECTION_TYPE_CHOICES = ["infection", "colonization", "unknown"]
+IMMUNE_STATUS_CHOICES = ["immunocompetent", "immunocompromised", "unknown"]
 
 
 class Case(Base):
@@ -23,6 +25,20 @@ class Case(Base):
     city = Column(String)
     state = Column(String)
     travel_history = Column(Text, nullable=True)
+
+    infection_type = Column(
+        Enum(*INFECTION_TYPE_CHOICES, name="infection_type_enum"), nullable=False)
+    immune_status = Column(
+        Enum(*IMMUNE_STATUS_CHOICES, name="immune_status_enum"), nullable=True)
+
+    hospitalized_abroad = Column(Boolean, default=False)
+    hospital_name = Column(String, nullable=True)
+
+    antifungal_therapy = Column(Boolean, default=False)
+    antifungal_therapy_details = Column(Text, nullable=True)
+
+    topical_therapy = Column(Boolean, default=False)
+    topical_therapy_details = Column(Text, nullable=True)
 
     clade = Column(String)  # Clade I, Clade III, etc.
     clade_region = Column(String)  # South Asian, African, etc.
@@ -59,6 +75,21 @@ class Submission(Base):
     clade = Column(String, nullable=True)
     clade_region = Column(String, nullable=True)
     relation_to = Column(String, nullable=True)
+
+    infection_type = Column(
+        Enum(*INFECTION_TYPE_CHOICES, name="infection_type_enum"), nullable=False)
+    immune_status = Column(
+        Enum(*IMMUNE_STATUS_CHOICES, name="immune_status_enum"), nullable=True)
+
+    hospitalized_abroad = Column(Boolean, default=False)
+    hospital_name = Column(String, nullable=True)
+
+    antifungal_therapy = Column(Boolean, default=False)
+    antifungal_therapy_details = Column(Text, nullable=True)
+
+    topical_therapy = Column(Boolean, default=False)
+    topical_therapy_details = Column(Text, nullable=True)
+
     mic_and = Column(Float, nullable=True)
     mic_mic = Column(Float, nullable=True)
     mic_cas = Column(Float, nullable=True)

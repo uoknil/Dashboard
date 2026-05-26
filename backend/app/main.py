@@ -165,6 +165,7 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db), curren
             antifungal_therapy_details=submission.antifungal_therapy_details,
             topical_therapy=submission.topical_therapy,
             topical_therapy_details=submission.topical_therapy_details,
+            additional_info=submission.additional_info,
             mic_and=submission.mic_and,
             mic_mic=submission.mic_mic,
             mic_cas=submission.mic_cas,

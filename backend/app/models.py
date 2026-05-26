@@ -44,6 +44,7 @@ class Case(Base):
     clade_region = Column(String)  # South Asian, African, etc.
     # Relation to other cases (not in our db, i think. zB: "Relationship to isolates from Rhodes (RHO1-4) confirmed" )
     relation_to = Column(String, nullable=True)
+    additional_info = Column(Text, nullable=True)
 
     # Resistance Data (MIC values in mg/L)
     mic_and = Column(Float, nullable=True)  # Anidulafungin
@@ -89,6 +90,7 @@ class Submission(Base):
 
     topical_therapy = Column(Boolean, default=False)
     topical_therapy_details = Column(Text, nullable=True)
+    additional_info = Column(Text, nullable=True)
 
     mic_and = Column(Float, nullable=True)
     mic_mic = Column(Float, nullable=True)

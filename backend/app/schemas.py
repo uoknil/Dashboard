@@ -35,6 +35,8 @@ class CaseReport(BaseModel):
     topical_therapy: Optional[bool] = None
     topical_therapy_details: Optional[str] = None
 
+    additional_info: Optional[str] = None
+
     # e.g., CLade I, Clade II, Clade III, Clade IV, etc.
     # clade: Optional[str] = None
     # e.g., "South Asian", "African" "South American", etc.
@@ -111,6 +113,7 @@ class CaseUpdate(BaseModel):
 
     topical_therapy: Optional[bool] = None
     topical_therapy_details: Optional[str] = None
+    additional_info: Optional[str] = None
 
     mic_and: Optional[float] = None
     mic_mic: Optional[float] = None
@@ -146,6 +149,7 @@ class SubmissionUpdate(BaseModel):
 
     topical_therapy: Optional[bool] = None
     topical_therapy_details: Optional[str] = None
+    additional_info: Optional[str] = None
 
     mic_and: Optional[float] = None
     mic_mic: Optional[float] = None

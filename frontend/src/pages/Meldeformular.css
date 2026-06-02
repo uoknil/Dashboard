@@ -4,7 +4,7 @@
   padding: 1.5rem 1rem 3rem;
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
-.topbar {
+/* .topbar {
   background: #1a3a5c; color: #e8f0f8; padding: 12px 20px;
   border-radius: 10px; margin-bottom: 1.25rem;
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
@@ -16,7 +16,7 @@
   border: 0.5px solid rgba(255,255,255,0.3);
   background: transparent; color: #9bb8d4; cursor: pointer;
 }
-.nav-btn-active { background: rgba(255,255,255,0.15); color: #e8f0f8; border-color: rgba(255,255,255,0.5); }
+.nav-btn-active { background: rgba(255,255,255,0.15); color: #e8f0f8; border-color: rgba(255,255,255,0.5); } */
 .info-banner {
   display: flex; gap: 10px; align-items: flex-start;
   background: #eff6ff; border: 0.5px solid #bfdbfe;

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { loginUser } from '../services/api';
 import './Login.css';
+import Navbar from '../components/Navbar';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -61,6 +62,7 @@ export default function Login() {
 
   return (
     <div className="login-page">
+   {/*  <Navbar />  */}
 
       {/* Logo */}
       <div className="login-logo">

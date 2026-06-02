@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Hintergrund.css';
+import Navbar from '../components/Navbar';
 
 // ─── Statische Daten ──────────────────────────────────────────
 const RESISTANCE = [
@@ -245,14 +246,16 @@ export default function Hintergrund() {
 
   return (
     <div className="info-page">
-      <header className="topbar">
+{/*       <header className="topbar">
         <div className="topbar-title">Candida auris Dashboard · Österreich</div>
         <nav className="topbar-nav">
           <button className="nav-btn" onClick={() => navigate('/')}>Dashboard</button>
           <button className="nav-btn" onClick={() => navigate('/meldung')}>Fallmeldung</button>
           <button className="nav-btn nav-btn-active">Informationen</button>
         </nav>
-      </header>
+      </header> */}
+
+      <Navbar />
 
       <div className="hero">
         <div className="hero-eyebrow">Wissenschaftliche Hintergrundinformation</div>

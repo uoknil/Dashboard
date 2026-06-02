@@ -6,6 +6,7 @@ import {
   fetchCases, updateCase, deleteCase,
 } from '../services/api';
 import './Admin.css';
+import Navbar from '../components/Navbar';
 
 // ─── Konstanten ───────────────────────────────────────────────
 const STATE_DE = {
@@ -380,8 +381,8 @@ export default function Admin() {
   return (
     <div className="admin-page">
 
-      <header className="topbar">
-        <div className="topbar-title">C. auris Dashboard · Admin-Bereich</div>
+{/*       <header className="topbar">
+        <div className="topbar-title">Candida auris Dashboard · Admin-Bereich</div>
         <div className="topbar-right">
           <span className="admin-user">
             Angemeldet als: <strong>{username}</strong>
@@ -391,8 +392,10 @@ export default function Admin() {
             Abmelden
           </button>
         </div>
-      </header>
+      </header> */}
 
+      <Navbar />
+      
       <div className="stats-bar">
         <StatCard value={loadingCases ? '…' : cases.length}       label="Fälle in DB" />
         <StatCard value={loadingSubs  ? '…' : submissions.length} label="Offene Meldungen" />

@@ -5,6 +5,7 @@ import { Line } from 'react-chartjs-2';
 import { fetchStatsByState, fetchStatsBySite,
   fetchStatsByClade, fetchStatsByYear, fetchLastUpdated } from '../services/api';
 import './Dashboard.css';
+import Navbar from '../components/Navbar';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement,
   LineElement, Title, Tooltip, Legend, Filler);
@@ -192,7 +193,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-page">
-      <header className="topbar">
+{/*       <header className="topbar">
         <div>
           <div className="topbar-title">Candida auris Surveillance Dashboard · Österreich</div>
           <div className="topbar-sub">Aggregierte, anonymisierte Falldaten auf Bundeslandebene</div>
@@ -210,7 +211,30 @@ export default function Dashboard() {
             {data.lastUpdated ? `Letzte Aktualisierung: ${data.lastUpdated}` : '—'}
           </div>
         </div>
-      </header>
+      </header> */}
+
+      <Navbar />
+<div className="dashboard-hero">
+  <div>
+    <div className="dashboard-hero-title">
+      Candida auris Surveillance Dashboard · Österreich
+    </div>
+    <div className="dashboard-hero-sub">
+      Aggregierte, anonymisierte Falldaten auf Bundeslandebene
+    </div>
+  </div>
+  <div className="status-row">
+    <span className={`status-dot status-${status}`} />
+    <span className="status-text">
+      {status === 'loading' && 'Daten werden geladen…'}
+      {status === 'ok'      && 'Aktuell'}
+      {status === 'error'   && 'API nicht erreichbar'}
+    </span>
+    <span className="topbar-sub">
+      {data.lastUpdated ? `Letzte Aktualisierung: ${data.lastUpdated}` : '—'}
+    </span>
+  </div>
+</div>
 
       {status === 'error' && (
         <div className="error-banner" role="alert">

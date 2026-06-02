@@ -3,20 +3,20 @@
   padding: 1.5rem 1rem 3rem;
   font-family: 'DM Sans', 'Segoe UI', sans-serif; min-height: 100vh;
 }
-.topbar {
+/* .topbar {
   background: #1a3a5c; color: #e8f0f8; padding: 10px 18px; border-radius: 10px;
   margin-bottom: 1.25rem; display: flex; align-items: center;
   justify-content: space-between; flex-wrap: wrap; gap: 8px;
 }
 .topbar-title { font-size: 15px; font-weight: 500; }
-.topbar-right { display: flex; align-items: center; gap: 12px; }
-.admin-user   { font-size: 12px; color: #9bb8d4; }
+.topbar-right { display: flex; align-items: center; gap: 12px; } */
+/* .admin-user   { font-size: 12px; color: #9bb8d4; } */
 .admin-user strong { color: #e8f0f8; }
-.logout-btn {
+/* .logout-btn {
   font-size: 11px; padding: 4px 12px; border-radius: 20px;
   border: 0.5px solid rgba(255,255,255,0.3);
   background: transparent; color: #9bb8d4; cursor: pointer; font-family: inherit;
-}
+} */
 .logout-btn:hover { background: rgba(255,255,255,0.1); }
 .stats-bar { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-bottom: 1.25rem; }
 .stat-card  { background: #fff; border: 0.5px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; }

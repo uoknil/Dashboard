@@ -6,7 +6,7 @@
 }
 
 /* ── Topbar ── */
-.topbar {
+/* .topbar {
   background: #1a3a5c;
   color: #e8f0f8;
   padding: 12px 20px;
@@ -17,10 +17,10 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-}
-.topbar-title { font-size: 17px; font-weight: 500; letter-spacing: 0.01em; }
+} */
+/* .topbar-title { font-size: 17px; font-weight: 500; letter-spacing: 0.01em; }
 .topbar-sub   { font-size: 12px; color: #9bb8d4; margin-top: 2px; }
-.topbar-right { text-align: right; }
+.topbar-right { text-align: right; } */
 .status-row   { display: flex; align-items: center; gap: 6px; justify-content: flex-end; font-size: 12px; }
 
 .status-dot {
@@ -223,4 +223,16 @@
   .metrics-grid { grid-template-columns: 1fr 1fr; }
   .main-grid    { grid-template-columns: 1fr; }
   .bottom-grid  { grid-template-columns: 1fr; }
+}
+
+.dashboard-hero {
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap;
+  gap: 8px; margin-bottom: 1.25rem;
+}
+.dashboard-hero-title {
+  font-size: 18px; font-weight: 500; color: #111827;
+}
+.dashboard-hero-sub {
+  font-size: 13px; color: #6b7280; margin-top: 3px;
 }

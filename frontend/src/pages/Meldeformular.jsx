@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { submitCase } from '../services/api';
 import './Meldeformular.css';
+import Navbar from '../components/Navbar';
 
 // ─── Schritt-Anzeige ─────────────────────────────────────────
 const STEPS = ['Fall & Lokalisation','Klinische Angaben','Therapie & Kontakt','Bestätigung'];
@@ -266,14 +267,16 @@ export default function Meldeformular() {
   // ── Formular ─────────────────────────────────────────────────
   return (
     <div className="form-page">
-      <header className="topbar">
+{/*       <header className="topbar">
         <div className="topbar-title">Candida auris Dashboard · Österreich</div>
         <nav className="topbar-nav">
           <button className="nav-btn">Dashboard</button>
           <button className="nav-btn nav-btn-active">Fallmeldung</button>
           <button className="nav-btn">Informationen</button>
         </nav>
-      </header>
+      </header> */}
+
+      <Navbar />
 
       <div className="info-banner" role="note">
         <div className="info-icon">i</div>

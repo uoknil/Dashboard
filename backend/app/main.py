@@ -20,6 +20,7 @@ origins = [
     "https://remarkable-rejoicing-production-598d.up.railway.app/",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
+    "https://dashboard-production-92a8.up.railway.app/",
     "http://127.0.0.1:3000",
 ]
 

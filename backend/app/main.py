@@ -17,14 +17,17 @@ app = FastAPI(title="Candida Auris Dashboard API")
 
 origins = [
     "http://localhost:5173",
+    "https://remarkable-rejoicing-production-598d.up.railway.app/",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
+    "https://dashboard-production-92a8.up.railway.app/",
     "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
+    # allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

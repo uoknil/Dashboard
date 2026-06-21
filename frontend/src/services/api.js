@@ -5,7 +5,7 @@
 // process.env.VITE_API_URL liest
 // aus der .env-Datei
 // Wenn die nicht existiert, fällt es auf localhost:8000 zurück
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const BASE = import.meta.env.VITE_API_URL || 'https://dashboard-production-92a8.up.railway.app';
 
 // Die zentrale request()-Funktion. (privat, kein export)
 // Nur die Funktionen unten benutzen sie
@@ -75,10 +75,10 @@ export async function loginUser(username, password) {
 // Kein Token nötig, da die Endpunkte im Backend öffentlich sind
 // Antwort kommt als JS-Objekt zurück
 export const fetchStatsByState = () => request('/api/stats/by-state');
-export const fetchStatsBySite  = () => request('/api/stats/by-site');
+export const fetchStatsBySite = () => request('/api/stats/by-site');
 export const fetchStatsByClade = () => request('/api/stats/by-clade');
-export const fetchStatsByYear  = () => request('/api/stats/by-year');
-export const fetchLastUpdated  = () => request('/api/meta/last-updated');
+export const fetchStatsByYear = () => request('/api/stats/by-year');
+export const fetchLastUpdated = () => request('/api/meta/last-updated');
 
 // Fallmeldung absenden
 // hier ist JSON nötig
@@ -97,7 +97,7 @@ export const submitCase = (payload) =>
 // Der Token wird automatisch von request() mitgeschickt
 // das ${id} in den URLs ist Template-Syntax
 // es fügt die ID direkt in den Pfad ein: z.B. /api/admin/cases/42
-export const fetchCases       = () => request('/api/admin/cases');
+export const fetchCases = () => request('/api/admin/cases');
 export const fetchSubmissions = () => request('/api/admin/submissions');
 
 // PATCH = nur die gesendeten Felder ändern

@@ -302,3 +302,19 @@ def update_submission(
     db.commit()
     db.refresh(submission)
     return submission
+
+# for world map visualization
+
+
+@app.get("/api/stats/by-country")
+def get_stats_by_country(db: Session = Depends(get_db)):
+    """
+    Returns aggregated case counts grouped by country of origin.
+    Example output for FE World Map: {"India": 4, "Turkey": 2}
+    """
+    results = db.query(
+        models.Case.origin_country,
+        func.count(models.Case.id)
+    ).filter(models.Case.origin_country.isnot(None)).group_by(models.Case.origin_country).all()
+
+    return {country: count for country, count in results}

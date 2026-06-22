@@ -52,6 +52,8 @@ class CaseReport(BaseModel):
     mic_amb: Optional[float] = Field(None, ge=0)  # Amphotericin B
     mic_mgx: Optional[float] = Field(None, ge=0)  # Manogepix
 
+    captcha_token: Optional[str] = None
+
     @model_validator(mode="after")
     def check_conditional_details(self) -> "CaseReport":
         if self.hospitalized_abroad and not (self.hospital_name and self.hospital_name.strip()):

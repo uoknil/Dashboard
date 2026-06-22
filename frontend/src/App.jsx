@@ -7,6 +7,7 @@ import Meldeformular     from './pages/Meldeformular';
 import Hintergrund       from './pages/Hintergrund';
 import Login             from './pages/Login';
 import Admin             from './pages/Admin';
+import About             from './pages/About';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/meldung" element={<Meldeformular />} />
           <Route path="/info"    element={<Hintergrund />} />
           <Route path="/login"   element={<Login />} />
+          <Route path="/about"   element={<About />} />
           <Route
             path="/admin"
             element={

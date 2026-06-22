@@ -52,6 +52,11 @@ export default function Navbar() {
           onClick={() => setMenuOpen(false)}>
           Informationen
         </NavLink>
+        <NavLink to="/about"
+          className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
+          onClick={() => setMenuOpen(false)}>
+          Über uns
+        </NavLink>
 
         {isAuthenticated && (
           <NavLink to="/admin"

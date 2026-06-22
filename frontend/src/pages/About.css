@@ -1,0 +1,188 @@
+.about-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+.about-hero {
+  background: #1a3a5c;
+  color: #e8f0f8;
+  border-radius: 10px;
+  padding: 32px 28px;
+  margin-bottom: 1.25rem;
+}
+
+.about-hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9bb8d4;
+  margin-bottom: 10px;
+}
+
+.about-hero-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.about-hero-sub {
+  font-size: 13.5px;
+  color: #9bb8d4;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+.card {
+  background: #fff;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+  margin-bottom: 16px;
+}
+
+.logos-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.logo-slot {
+  flex: 1;
+  min-width: 200px;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.logo-img {
+  max-height: 60px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.logo-fallback {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.person-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.person-card {
+  text-align: center;
+}
+
+.person-photo-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  overflow: hidden;
+  background: #f0ece6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.person-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.person-initials {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1a3a5c;
+  color: #e8f0f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.person-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.person-role {
+  font-size: 11.5px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.impressum-block {
+  margin-bottom: 18px;
+}
+
+.impressum-block:last-child {
+  margin-bottom: 0;
+}
+
+.impressum-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1a3a5c;
+  margin-bottom: 6px;
+}
+
+.impressum-org {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.impressum-org:last-child {
+  margin-bottom: 0;
+}
+
+.impressum-org a {
+  color: #2878b8;
+  text-decoration: none;
+}
+
+.impressum-org a:hover {
+  text-decoration: underline;
+}
+
+.impressum-text {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.75;
+}
+
+@media (max-width: 640px) {
+  .person-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-hero {
+    padding: 24px 18px;
+  }
+}

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { submitCase } from '../services/api';
 import './Meldeformular.css';
 import Navbar from '../components/Navbar';
+import ReCAPTCHA from "react-google-recaptcha";
 
 // ─── Schritt-Anzeige ─────────────────────────────────────────
 const STEPS = ['Fall & Lokalisation','Klinische Angaben','Therapie & Kontakt','Bestätigung'];
@@ -118,7 +119,7 @@ export default function Meldeformular() {
   const [form,         setForm]         = useState(INITIAL);
   const [errors,       setErrors]       = useState({});
   const [step,         setStep]         = useState(1);
-  const [captcha,      setCaptcha]      = useState(false);
+  const [captchaToken,  setCaptchaToken] = useState("");
   const [submitState,  setSubmitState]  = useState('idle');
   const [apiError,     setApiError]     = useState('');
   const [submissionId, setSubmissionId] = useState(null);
@@ -183,6 +184,7 @@ export default function Meldeformular() {
       state: form.state,
       travel_history: form.travel_history,
       infection_type: form.infection_type,
+      captcha_token: captchaToken,
       ...(form.age !== '' && parseInt(form.age) > 0 && parseInt(form.age) < 120
           ? { age: parseInt(form.age) } : {}),
       ...(form.immune_status ? { immune_status: form.immune_status } : {}),
@@ -201,7 +203,7 @@ export default function Meldeformular() {
 
   // ── Absenden ─────────────────────────────────────────────────
   async function handleSubmit() {
-    if (!captcha) {
+    if (!captchaToken) {
       setErrors((e) => ({ ...e, captcha: 'Bitte bestätigen Sie, dass Sie kein Roboter sind.' }));
       return;
     }
@@ -212,16 +214,16 @@ export default function Meldeformular() {
       setSubmissionId(res.submission_id);
       setSubmitState('success');
     } catch (err) {
-      setApiError(err.status === 422
-        ? `Validierungsfehler: ${err.message}`
-        : `Fehler: ${err.message}`);
+    // If it's an object, stringify it so it doesn't render as [object Object]
+      const errorMsg = typeof err.message === 'object' ? JSON.stringify(err.message) : err.message;
+      setApiError(err.status === 422 ? `Validierungsfehler: ${errorMsg}` : `Fehler: ${errorMsg}`);
       setSubmitState('error');
     }
   }
 
   function reset() {
     setForm(INITIAL); setErrors({}); setStep(1);
-    setCaptcha(false); setSubmitState('idle');
+    setCaptchaToken(""); setSubmitState('idle');
     setApiError(''); setSubmissionId(null);
   }
 
@@ -483,20 +485,21 @@ export default function Meldeformular() {
               ))}
             </div>
           </div>
-          <div className="panel">
+<div className="panel">
             <div className="panel-title">Sicherheitsüberprüfung</div>
-            <div className={`captcha-box${errors.captcha ? ' captcha-error' : ''}`}>
-              <button type="button"
-                className={`captcha-check${captcha ? ' captcha-checked' : ''}`}
-                onClick={() => { setCaptcha(!captcha); setErrors((e) => ({ ...e, captcha: '' })); }}
-                aria-pressed={captcha} aria-label="Ich bin kein Roboter" />
-              <div>
-                <div className="captcha-label">Ich bin kein Roboter</div>
-                <div className="captcha-sub">Automatisierte Übermittlungen werden verhindert</div>
-              </div>
-              <div className="captcha-brand">reCAPTCHA<br /><span>Datenschutz · AGB</span></div>
+            
+            {/* Real Official Google reCAPTCHA widget alignment container */}
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+              <ReCAPTCHA
+                sitekey="6LcKBS0tAAAAAHx2okwkn1eIg0D2Vtwilkhc0Z3o"
+                onChange={(token) => {
+                  setCaptchaToken(token || "");
+                  setErrors((e) => ({ ...e, captcha: '' }));
+                }}
+              />
             </div>
-            {errors.captcha && <div className="field-err-msg" style={{marginTop:'6px'}}>{errors.captcha}</div>}
+            
+            {errors.captcha && <div className="field-err-msg" style={{textAlign: 'center', marginTop:'6px'}}>{errors.captcha}</div>}
           </div>
           {submitState === 'error' && (
             <div className="api-err-banner" role="alert">

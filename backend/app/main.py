@@ -171,6 +171,9 @@ def approve_submission(submission_id: int, db: Session = Depends(get_db), curren
             topical_therapy=submission.topical_therapy,
             topical_therapy_details=submission.topical_therapy_details,
             additional_info=submission.additional_info,
+            # for world map visualization
+            origin_country=submission.origin_country,
+
             mic_and=submission.mic_and,
             mic_mic=submission.mic_mic,
             mic_cas=submission.mic_cas,

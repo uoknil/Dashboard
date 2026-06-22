@@ -133,7 +133,6 @@ async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTa
     db.commit()
     db.refresh(new_submission)
 
-    report_dict = report.model_dump()
     # Dynamically build a list of all fields for the email
     details_html = "".join([f"<li><b>{k.replace('_', ' ').title()}:</b> {v}</li>"
                             for k, v in report_dict.items() if v is not None])

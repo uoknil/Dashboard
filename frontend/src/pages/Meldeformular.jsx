@@ -364,7 +364,7 @@ export default function Meldeformular() {
                 hint='"male" | "female" | "divers" | "inter" | "other"'>
                 <SelectField id="gender" value={form.gender} onChange={(v) => set('gender', v)}
                   error={!!errors.gender}
-                  options={[['male','männlich'],['female','weiblich'],['divers','divers'],['inter','inter'],['other','andere']]} />
+                  options={[['male','männlich'],['female','weiblich'],['other','divers'],['intersex','intersex / inter'],['unknown','unbekannt']]} />
               </Field>
               <Field id="age" label="Alter" hint="Optional, 1–119">
                 <input id="age" type="number" value={form.age} min="1" max="119"

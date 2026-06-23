@@ -436,16 +436,24 @@ async def forgot_password_request(
     # URL structure matching what your frontend router will capture
     # Locally: http://localhost:5173/reset-password?token=XYZ...
     # In Prod: https://candida-auris-dashboard.at/reset-password?token=XYZ...
+    # URL structure matching what your frontend router will capture
     frontend_base = os.getenv("FRONTEND_URL", "http://localhost:5173")
     reset_link = f"{frontend_base}/reset-password?token={reset_token}"
 
     html = f"""
-    <h3>Password Reset Request Notification</h3>
-    <p>A password reset link was requested for the following dashboard admin username: <b>{user.username}</b></p>
-    <p>If this action is legitimate, copy and forward the following recovery link securely to them:</p>
-    <p><a href="{reset_link}" style="padding: 8px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Forward Password Reset Link</a></p>
-    <hr>
-    <p style="color: red;"><i>Warning: This recovery link will expire in exactly 15 minutes.</i></p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+        <h3 style="color: #111;">Password Reset Request Notification</h3>
+        <p>A password reset link was requested for the following dashboard admin username: <b>{user.username}</b></p>
+        
+        <p>If this action is legitimate, copy and forward the following recovery link securely to them:</p>
+        
+        <div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 12px; margin: 15px 0; word-break: break-all; font-family: monospace; font-size: 14px;">
+            {reset_link}
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #dee2e6; margin: 20px 0;">
+        <p style="color: #dc3545; font-style: italic; font-weight: bold;">Warning: This recovery link will expire in exactly 15 minutes.</p>
+    </div>
     """
 
     message = MessageSchema(

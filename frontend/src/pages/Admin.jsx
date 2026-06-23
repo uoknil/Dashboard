@@ -242,10 +242,10 @@ function EditModal({ item, type, onSave, onClose }) {
             <input id="ef-hospital_name" value={form.hospital_name || ''}
               onChange={(e) => set('hospital_name', e.target.value)} />
           </ModalField>
-          <ModalField id="origin_country" label="Herkunftsland (für Weltkarte)">
+          <ModalField id="origin_country" label="Herkunftsland (manuelle Eingabe für Weltkarte)">
             <input id="ef-origin_country" value={form.origin_country || ''}
               onChange={(e) => set('origin_country', e.target.value)}
-              placeholder="z. B. Indien, Türkei (mehrere möglich)" />
+              placeholder="z. B. Indien" />
           </ModalField>
           <ModalField id="antifungal_therapy" label="Antimykotische Therapie">
             <select id="ef-antifungal_therapy" value={form.antifungal_therapy ? 'yes' : 'no'}

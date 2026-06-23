@@ -78,6 +78,7 @@ export const fetchStatsByState = () => request('/api/stats/by-state');
 export const fetchStatsBySite = () => request('/api/stats/by-site');
 export const fetchStatsByClade = () => request('/api/stats/by-clade');
 export const fetchStatsByYear = () => request('/api/stats/by-year');
+export const fetchStatsByCountry = () => request('/api/stats/by-country');
 export const fetchLastUpdated = () => request('/api/meta/last-updated');
 
 // Fallmeldung absenden

@@ -9,7 +9,6 @@ const RESISTANCE = [
   { label: 'Voriconazol (Azole)',    pct: 75, color: '#e67e22' },
   { label: 'Amphotericin B',         pct: 35, color: '#e67e22' },
   { label: 'Echinocandine',          pct: 10, color: '#1D9E75' },
-  { label: 'Pan-Resistenz (alle 3)', pct: 5,  color: '#c0392b' },
 ];
 
 const KLINIK_ACCORDION = [
@@ -40,7 +39,7 @@ const CLADES = [
   { n: 'III', region: 'Afrika',                      res: 'Azole (variabel)', col: '#e67e22' },
   { n: 'IV',  region: 'Südamerika',                  res: 'Gering',           col: '#1D9E75' },
   { n: 'V',   region: 'Iran / Naher Osten',          res: 'In Abklärung',     col: '#6b7280' },
-  { n: 'VI',  region: 'Neu beschrieben (2023)',       res: 'In Abklärung',     col: '#6b7280' },
+  { n: 'VI',  region: 'Indo-Malaysisch / Singapur (2023)',       res: 'In Abklärung',     col: '#6b7280' },
 ];
 
 const PROCESS_STEPS = [

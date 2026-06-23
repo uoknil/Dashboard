@@ -8,6 +8,7 @@ import Hintergrund       from './pages/Hintergrund';
 import Login             from './pages/Login';
 import Admin             from './pages/Admin';
 import About             from './pages/About';
+import ResetPassword     from './pages/ResetPassword';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/info"    element={<Hintergrund />} />
           <Route path="/login"   element={<Login />} />
           <Route path="/about"   element={<About />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/admin"
             element={

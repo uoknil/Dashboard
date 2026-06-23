@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   fetchSubmissions, updateSubmission, approveSubmission, rejectSubmission,
   fetchCases, updateCase, deleteCase,
+  fetchUsers, createUser, toggleUser,
 } from '../services/api';
 import Navbar from '../components/Navbar';
 // import { COUNTRY_OPTIONS } from '../constants/countries';
@@ -31,7 +32,7 @@ const CLADE_INFO = {
   'Clade III': 'Afrikanische Klade',
   'Clade IV':  'Südamerikanische Klade',
   'Clade V':   'Iranische Klade',
-  'Clade VI':  'Neu beschriebene Klade',
+  'Clade VI':  'Indo-Malaysische / Singapur-Klade',
 };
 const MIC_KEYS = ['mic_and','mic_mic','mic_cas','mic_flc','mic_pos','mic_vor','mic_5fc','mic_amb','mic_mgx'];
 const MIC_LABELS = {
@@ -414,6 +415,142 @@ function CasesTable({ cases, onEdit, onDelete, expandedId, onToggleExpand }) {
   );
 }
 
+// ─── Benutzerverwaltung (Admin-Konten) ───────────────────────
+function UserManagement({ currentUsername, safeApi, showToast }) {
+  const [users,      setUsers]      = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [newName,    setNewName]    = useState('');
+  const [newPass,    setNewPass]    = useState('');
+  const [formError,  setFormError]  = useState('');
+  const [busy,       setBusy]       = useState(false);
+
+  // Benutzerliste laden
+  useEffect(() => {
+    safeApi(async () => {
+      const data = await fetchUsers();
+      if (data) setUsers(data);
+    }).finally(() => setLoading(false));
+  }, [safeApi]);
+
+  // Konto aktivieren / deaktivieren
+  async function handleToggle(user) {
+    setBusy(true);
+    try {
+      const updated = await safeApi(() => toggleUser(user.id, !user.is_active));
+      if (updated) {
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+        showToast(`Konto "${user.username}" ist jetzt ${updated.is_active ? 'aktiv' : 'deaktiviert'}.`);
+      }
+    } catch (err) {
+      showToast(err.status === 400 ? 'Sie können Ihr eigenes Konto nicht deaktivieren.' : 'Fehler beim Ändern des Kontos.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Neues Admin-Konto anlegen
+  async function handleCreate() {
+    setFormError('');
+    if (newName.trim().length < 3) { setFormError('Benutzername: mindestens 3 Zeichen.'); return; }
+    if (newPass.length < 6)        { setFormError('Passwort: mindestens 6 Zeichen.'); return; }
+
+    setBusy(true);
+    try {
+      const created = await safeApi(() => createUser(newName.trim(), newPass));
+      if (created) {
+        setUsers((prev) => [...prev, created]);
+        setNewName('');
+        setNewPass('');
+        showToast(`Admin-Konto "${created.username}" angelegt ✓`);
+      }
+    } catch (err) {
+      setFormError(err.status === 400 ? 'Benutzername bereits vergeben.' : 'Fehler beim Anlegen des Kontos.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div role="tabpanel">
+      {/* Konto anlegen */}
+      <div className="card">
+        <div className="card-title">Neues Admin-Konto anlegen</div>
+        <div className="modal-grid">
+          <div className="modal-field">
+            <label htmlFor="nu-username">Benutzername</label>
+            <input id="nu-username" value={newName}
+              onChange={(e) => { setNewName(e.target.value); setFormError(''); }}
+              placeholder="z. B. neuer_arzt" autoComplete="off" />
+          </div>
+          <div className="modal-field">
+            <label htmlFor="nu-password">Passwort</label>
+            <input id="nu-password" type="password" value={newPass}
+              onChange={(e) => { setNewPass(e.target.value); setFormError(''); }}
+              placeholder="mindestens 6 Zeichen" autoComplete="new-password" />
+          </div>
+        </div>
+        {formError && <div className="login-err-msg" style={{ marginTop: 8 }}>{formError}</div>}
+        <div className="modal-actions">
+          <button className="btn-primary" onClick={handleCreate} disabled={busy}>
+            Konto anlegen
+          </button>
+        </div>
+      </div>
+
+      {/* Bestehende Konten */}
+      <div className="card">
+        <div className="card-title">
+          Bestehende Admin-Konten
+          {!loading && <span className="card-count">{users.length} Konten</span>}
+        </div>
+        {loading ? (
+          <div className="loading-state">Konten werden geladen…</div>
+        ) : users.length === 0 ? (
+          <div className="empty-state">Keine Konten gefunden.</div>
+        ) : (
+          <div className="table-wrapper">
+            <table className="cases-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Benutzername</th><th>Status</th><th>Aktion</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td className="td-muted">#{u.id}</td>
+                    <td>
+                      {u.username}
+                      {u.username === currentUsername && (
+                        <span className="meta-chip meta-blue" style={{ marginLeft: 8 }}>Sie</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`type-badge ${u.is_active ? 'badge-col' : 'badge-unk'}`}>
+                        {u.is_active ? 'aktiv' : 'deaktiviert'}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className={`tbl-btn${u.is_active ? ' tbl-btn-danger' : ''}`}
+                        onClick={() => handleToggle(u)}
+                        disabled={busy || u.username === currentUsername}
+                        title={u.username === currentUsername ? 'Eigenes Konto kann nicht deaktiviert werden' : ''}
+                      >
+                        {u.is_active ? 'Deaktivieren' : 'Aktivieren'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Hauptkomponente ──────────────────────────────────────────
 export default function Admin() {
   const { username, logout } = useAuth();
@@ -556,6 +693,7 @@ export default function Admin() {
         {[
           { id:'submissions', label:'Offene Meldungen', count: submissions.length },
           { id:'cases',       label:'Falldaten',        count: null },
+          { id:'users',       label:'Benutzer',         count: null },
         ].map((t) => (
           <button key={t.id} role="tab" aria-selected={activeTab===t.id}
             className={`admin-tab${activeTab===t.id?' active':''}`}
@@ -601,6 +739,14 @@ export default function Admin() {
             ▸ anklicken zeigt alle Datenfelder dieses Falls (Alter, MIC-Werte, Therapie, etc.)
           </div>
         </div>
+      )}
+
+      {activeTab === 'users' && (
+        <UserManagement
+          currentUsername={username}
+          safeApi={safeApi}
+          showToast={showToast}
+        />
       )}
 
       {editItem && (

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { loginUser } from '../services/api';
+import { loginUser, forgotPassword } from '../services/api';
 import './Login.css';
 import Navbar from '../components/Navbar';
 
@@ -11,6 +11,13 @@ export default function Login() {
   const [errors,   setErrors]   = useState({});
   const [apiError, setApiError] = useState('');
   const [loading,  setLoading]  = useState(false);
+
+  // Passwort-vergessen-Bereich
+  const [forgotMode,   setForgotMode]   = useState(false);  // zeigt das Benutzername-Feld
+  const [forgotName,   setForgotName]   = useState('');
+  const [forgotMsg,    setForgotMsg]    = useState('');     // Bestätigungstext
+  const [forgotError,  setForgotError]  = useState('');
+  const [forgotBusy,   setForgotBusy]   = useState(false);
 
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -57,6 +64,31 @@ export default function Login() {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  // ── Passwort vergessen ───────────────────────────────────────
+  async function handleForgot() {
+    setForgotError('');
+    setForgotMsg('');
+    if (!forgotName.trim()) {
+      setForgotError('Bitte geben Sie Ihren Benutzernamen ein.');
+      return;
+    }
+    setForgotBusy(true);
+    try {
+      await forgotPassword(forgotName.trim());
+      // Backend antwortet aus Sicherheitsgründen immer mit Erfolg —
+      // egal ob der Benutzername existiert. Daher zeigen wir immer dieselbe Meldung.
+      setForgotMsg(
+        'Falls dieses Konto existiert, wurde ein Wiederherstellungslink an die ' +
+        'System-/Supervisor-E-Mail gesendet. Bitte kontaktieren Sie Kathrin Spettel, ' +
+        'um Ihren Link zu erhalten.'
+      );
+    } catch (err) {
+      setForgotError(`Verbindungsfehler: ${err.message}. Läuft der Backend-Server?`);
+    } finally {
+      setForgotBusy(false);
     }
   }
 
@@ -131,7 +163,7 @@ export default function Login() {
             )}
           </div>
 
-          <button
+<button
             type="submit"
             className="login-btn"
             disabled={loading}
@@ -141,6 +173,62 @@ export default function Login() {
               : 'Anmelden'}
           </button>
         </form>
+
+        {/* Passwort vergessen */}
+        {!forgotMode ? (
+          <button
+            type="button"
+            className="login-forgot-link"
+            onClick={() => { setForgotMode(true); setApiError(''); }}
+          >
+            Passwort vergessen?
+          </button>
+        ) : (
+          <div className="login-forgot-box">
+            {forgotMsg ? (
+              <div className="login-forgot-success" role="status">{forgotMsg}</div>
+            ) : (
+              <>
+                <div className="login-field">
+                  <label htmlFor="forgot-username">Benutzername</label>
+                  <input
+                    id="forgot-username"
+                    type="text"
+                    value={forgotName}
+                    onChange={(e) => { setForgotName(e.target.value); setForgotError(''); }}
+                    placeholder="Ihr Benutzername"
+                    autoComplete="username"
+                  />
+                </div>
+                {forgotError && (
+                  <div className="login-err-msg" role="alert">{forgotError}</div>
+                )}
+                <button
+                  type="button"
+                  className="login-btn"
+                  onClick={handleForgot}
+                  disabled={forgotBusy}
+                >
+                  {forgotBusy
+                    ? <><span className="spinner" aria-hidden="true" /> Wird gesendet…</>
+                    : 'Wiederherstellungslink anfordern'}
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              className="login-forgot-link"
+              onClick={() => {
+                setForgotMode(false);
+                setForgotName('');
+                setForgotMsg('');
+                setForgotError('');
+              }}
+            >
+              ← Zurück zur Anmeldung
+            </button>
+          </div>
+        )}
 
         <div className="login-notice">
           <strong>Token-Gültigkeit:</strong> 180 Minuten. Kein automatischer Refresh.<br />

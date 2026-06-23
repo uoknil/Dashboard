@@ -11,7 +11,9 @@ import json
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from fastapi.security import OAuth2PasswordRequestForm
 from . import auth
+from jose import JWTError, jwt
 from .utils import get_region_from_clade
+from datetime import datetime, timedelta, timezone
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -349,3 +351,143 @@ def get_stats_by_country(db: Session = Depends(get_db)):
     ).filter(models.Case.origin_country.isnot(None)).group_by(models.Case.origin_country).all()
 
     return {country: count for country, count in results}
+
+
+# ________________
+# Add to app/main.py
+
+# 1. READ ALL ADMINS (For the FE to display the table/list of users)
+@app.get("/api/admin/users", response_model=list[schemas.UserOut])
+def list_admin_users(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    return db.query(models.User).order_by(models.User.id).all()
+
+
+# 2. CREATE ADMIN ACCOUNT (Replaces create_admin.py)
+@app.post("/api/admin/users", response_model=schemas.UserOut, status_code=201)
+def create_admin_account(
+    user_in: schemas.UserCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    existing_user = db.query(models.User).filter(
+        models.User.username == user_in.username).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=400, detail="Username already registered")
+
+    hashed_pw = auth.get_password_hash(user_in.password)
+    new_user = models.User(username=user_in.username,
+                           hashed_password=hashed_pw)
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+# 3. DISABLE/ENABLE ACCOUNT (Replaces toggle_account.py)
+@app.patch("/api/admin/users/{user_id}/toggle", response_model=schemas.UserOut)
+def toggle_admin_account(
+    user_id: int,
+    status_in: schemas.UserToggle,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=400, detail="You cannot disable your own account!")
+
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User account not found")
+
+    user.is_active = status_in.is_active
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+# 4. FORGOT PASSWORD (Triggers the Stakeholder Relay Email)
+@app.post("/api/auth/forgot-password")
+async def forgot_password_request(
+    request_in: schemas.PasswordResetRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(
+        models.User.username == request_in.username).first()
+    # Security note: Return success even if username doesn't exist so scanners can't harvest names
+    if not user:
+        return {"message": "If the account exists, a verification link has been sent to the supervisor email."}
+
+    # Generate a short-lived recovery token using existing JWT builder (expires in 15 mins)
+    token_data = {"sub": user.username, "type": "password_reset"}
+
+    # We temporarily overwrite expire configuration block inline for 15 mins
+    to_encode = token_data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    reset_token = jwt.encode(to_encode, auth.SECRET_KEY,
+                             algorithm=auth.ALGORITHM)
+
+    # URL structure matching what your frontend router will capture
+    # Locally: http://localhost:5173/reset-password?token=XYZ...
+    # In Prod: https://candida-auris-dashboard.at/reset-password?token=XYZ...
+    frontend_base = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    reset_link = f"{frontend_base}/reset-password?token={reset_token}"
+
+    html = f"""
+    <h3>Password Reset Request Notification</h3>
+    <p>A password reset link was requested for the following dashboard admin username: <b>{user.username}</b></p>
+    <p>If this action is legitimate, copy and forward the following recovery link securely to them:</p>
+    <p><a href="{reset_link}" style="padding: 8px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Forward Password Reset Link</a></p>
+    <hr>
+    <p style="color: red;"><i>Warning: This recovery link will expire in exactly 15 minutes.</i></p>
+    """
+
+    message = MessageSchema(
+        subject=f"Dashboard Alert: Password Reset Request [{user.username}]",
+        recipients=[os.getenv("MAIL_FROM")],
+        body=html,
+        subtype=MessageType.html
+    )
+
+    fm = FastMail(conf)
+    background_tasks.add_task(fm.send_message, message)
+
+    return {"message": "If the account exists, a verification link has been sent to the supervisor email."}
+
+
+# 5. EXECUTE PASSWORD RESET
+@app.post("/api/auth/reset-password")
+def execute_password_reset(
+    reset_in: schemas.PasswordResetConfirm,
+    db: Session = Depends(get_db)
+):
+    try:
+        payload = jwt.decode(reset_in.token, auth.SECRET_KEY,
+                             algorithms=[auth.ALGORITHM])
+        username: str = payload.get("sub")
+        token_type: str = payload.get("type")
+
+        if username is None or token_type != "password_reset":
+            raise HTTPException(
+                status_code=400, detail="Invalid token configuration")
+
+    except JWTError:
+        raise HTTPException(
+            status_code=400, detail="The recovery link is invalid or has expired.")
+
+    user = db.query(models.User).filter(
+        models.User.username == username).first()
+    if not user:
+        raise HTTPException(
+            status_code=404, detail="Associated user account not found")
+
+    user.hashed_password = auth.get_password_hash(reset_in.new_password)
+    db.commit()
+
+    return {"message": "Password successfully reset. You can now log in with your new credentials."}

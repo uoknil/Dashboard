@@ -167,3 +167,24 @@ class SubmissionUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
+# for staging
+# Add to the bottom of app/schemas.py
+
+
+class UserCreate(BaseModel):
+    username: str = Field(..., min_length=3)
+    password: str = Field(..., min_length=6)
+
+
+class UserToggle(BaseModel):
+    is_active: bool
+
+
+class PasswordResetRequest(BaseModel):
+    username: str
+
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    new_password: str = Field(..., min_length=6)

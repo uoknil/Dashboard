@@ -140,64 +140,29 @@
   color: #111827;
   font-weight: 500;
 }
-.stat-row {
+.info-stat-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 14px;
 }
-.stat-card {
+.info-stat-card {
   background: #1a3a5c;
   color: #e8f0f8;
   border-radius: 10px;
   padding: 16px 18px;
 }
-.stat-val {
+.info-stat-val {
   font-size: 28px;
   font-weight: 500;
   line-height: 1;
   color: #fff;
 }
-.stat-label {
+.info-stat-label {
   font-size: 11px;
   color: #9bb8d4;
   margin-top: 5px;
   line-height: 1.4;
-}
-.res-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 0.5px solid #e5e7eb;
-}
-.res-row:last-child {
-  border-bottom: none;
-}
-.res-label {
-  width: 175px;
-  color: #6b7280;
-  flex-shrink: 0;
-  font-size: 12px;
-}
-.res-track {
-  flex: 1;
-  background: #f3f4f6;
-  border-radius: 3px;
-  height: 12px;
-  overflow: hidden;
-}
-.res-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.8s ease;
-}
-.res-val {
-  width: 36px;
-  text-align: right;
-  font-weight: 600;
-  color: #111827;
-  font-size: 12px;
 }
 .acc-item {
   border-bottom: 0.5px solid #e5e7eb;
@@ -233,11 +198,23 @@
 .acc-header.open .acc-arrow {
   transform: rotate(180deg);
 }
+/*
 .acc-body {
   font-size: 13px;
   color: #374151;
   line-height: 1.75;
   padding: 0 4px 14px;
+}
+*/
+
+.acc-body {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.75;
+  padding: 12px 14px;
+  background: #f8f6f1;
+  border-radius: 8px;
+  margin: 0 0 14px;
 }
 .timeline {
   padding: 4px 0;
@@ -372,6 +349,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+/*
 .glossar-item {
   background: #f8f6f1;
   border-radius: 7px;
@@ -383,6 +361,26 @@
   color: #111827;
   margin-bottom: 4px;
 }
+*/
+
+.glossar-item {
+  background: #f8f6f1;
+  border-radius: 7px;
+  padding: 12px 14px;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.glossar-item:hover {
+  background: #f2eee5;
+}
+.glossar-term {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a3a5c;
+  margin-bottom: 4px;
+}
+
 .glossar-def {
   font-size: 12px;
   color: #6b7280;
@@ -425,7 +423,7 @@
   background: rgba(255, 255, 255, 0.18);
 }
 @media (max-width: 640px) {
-  .stat-row {
+  .info-stat-row {
     grid-template-columns: 1fr;
   }
   .glossar-grid {

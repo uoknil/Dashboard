@@ -7,7 +7,7 @@ import {
   fetchUsers, createUser, toggleUser,
 } from '../services/api';
 import Navbar from '../components/Navbar';
-// import { COUNTRY_OPTIONS } from '../constants/countries';
+import { COUNTRY_OPTIONS } from '../constants/countries';
 import './Admin.css';
 
 // ─── Konstanten ───────────────────────────────────────────────
@@ -242,10 +242,14 @@ function EditModal({ item, type, onSave, onClose }) {
             <input id="ef-hospital_name" value={form.hospital_name || ''}
               onChange={(e) => set('hospital_name', e.target.value)} />
           </ModalField>
-          <ModalField id="origin_country" label="Herkunftsland (manuelle Eingabe für Weltkarte)">
-            <input id="ef-origin_country" value={form.origin_country || ''}
-              onChange={(e) => set('origin_country', e.target.value)}
-              placeholder="z. B. Indien" />
+          <ModalField id="origin_country" label="Herkunftsland (für Weltkarte)">
+            <select id="ef-origin_country" value={form.origin_country || ''}
+              onChange={(e) => set('origin_country', e.target.value)}>
+              <option value="">– keine Angabe –</option>
+              {COUNTRY_OPTIONS.map(([val, label]) => (
+                <option key={val} value={val}>{label}</option>
+              ))}
+            </select>
           </ModalField>
           <ModalField id="antifungal_therapy" label="Antimykotische Therapie">
             <select id="ef-antifungal_therapy" value={form.antifungal_therapy ? 'yes' : 'no'}

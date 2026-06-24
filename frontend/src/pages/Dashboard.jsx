@@ -7,6 +7,7 @@ import { fetchStatsByState, fetchStatsBySite,
 import './Dashboard.css';
 import Navbar from '../components/Navbar';
 import WorldMap from '../components/WorldMap';
+import AustriaMapGeo from '../components/AustriaMapGeo';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement,
   LineElement, Title, Tooltip, Legend, Filler);
@@ -18,35 +19,7 @@ const STATE_MAP = {
   Vorarlberg: 'Vorarlberg', Burgenland: 'Burgenland',
 };
 
-const COLOR_SCALE = ['#f0ece6','#d4e8f7','#9fc7e8','#5a9fd4','#2878b8','#1a3a5c'];
 
-const BUNDESLAENDER = [
-  { name:'Wien',            cx:313, cy:141,
-    path:'M 305 138 L 315 132 L 322 138 L 322 148 L 310 150 L 303 145 Z' },
-  { name:'Niederösterreich',cx:290, cy:112,
-    path:'M 230 95 L 325 85 L 355 100 L 340 135 L 322 138 L 315 132 L 305 138 L 303 145 L 280 148 L 255 140 L 235 130 L 225 110 Z' },
-  { name:'Steiermark',      cx:272, cy:178,
-    path:'M 235 148 L 280 148 L 303 145 L 310 150 L 322 148 L 335 160 L 320 190 L 295 205 L 265 210 L 240 195 L 225 170 L 228 152 Z' },
-  { name:'Oberösterreich',  cx:185, cy:108,
-    path:'M 150 80 L 228 75 L 230 95 L 225 110 L 210 130 L 185 138 L 155 125 L 140 105 Z' },
-  { name:'Salzburg',        cx:148, cy:135,
-    path:'M 110 110 L 150 100 L 155 125 L 185 138 L 185 158 L 160 168 L 135 155 L 112 138 L 108 120 Z' },
-  { name:'Tirol',           cx:83,  cy:128,
-    path:'M 60 115 L 108 108 L 110 110 L 108 120 L 112 138 L 90 145 L 70 138 L 52 128 Z' },
-  { name:'Kärnten',         cx:178, cy:178,
-    path:'M 135 155 L 160 168 L 185 158 L 210 168 L 225 170 L 225 185 L 205 195 L 175 198 L 148 185 L 130 168 Z' },
-  { name:'Vorarlberg',      cx:48,  cy:118,
-    path:'M 38 110 L 58 105 L 60 115 L 52 128 L 40 125 Z' },
-  { name:'Burgenland',      cx:348, cy:142,
-    path:'M 322 138 L 340 135 L 355 100 L 370 110 L 365 145 L 350 175 L 335 160 L 322 148 Z' },
-];
-
-function getMapColor(value, max) {
-  if (!value || value === 0) return COLOR_SCALE[0];
-  const t = value / max;
-  const idx = Math.min(Math.floor(t * (COLOR_SCALE.length - 1)), COLOR_SCALE.length - 1);
-  return COLOR_SCALE[Math.max(1, idx)];
-}
 
 function MetricCard({ label, value, sub }) {
   return (
@@ -68,56 +41,6 @@ function HorizontalBar({ label, value, max, color }) {
         <div className="bar-fill" style={{ width: `${pct}%`, background: color }} />
       </div>
       <div className="bar-val">{value}</div>
-    </div>
-  );
-}
-
-function AustriaMap({ stateData }) {
-  const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
-  const svgRef = useRef(null);
-  const germanData = {};
-  Object.entries(stateData).forEach(([k, v]) => {
-    germanData[STATE_MAP[k] || k] = v;
-  });
-  const max = Math.max(...Object.values(germanData), 1);
-  const handleMove = useCallback((e, name, v) => {
-    const r = svgRef.current?.getBoundingClientRect();
-    if (!r) return;
-    setTooltip({ visible: true, text: `${name}: ${v} ${v === 1 ? 'Fall' : 'Fälle'}`,
-      x: e.clientX - r.left + 10, y: e.clientY - r.top - 30 });
-  }, []);
-  return (
-    <div className="map-wrapper">
-      {tooltip.visible && (
-        <div className="map-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
-          {tooltip.text}
-        </div>
-      )}
-      <svg ref={svgRef} viewBox="0 0 500 280" className="austria-svg">
-        {BUNDESLAENDER.map((bl) => {
-          const v = germanData[bl.name] || 0;
-          return (
-            <g key={bl.name}>
-              <path d={bl.path} fill={getMapColor(v, max)}
-                stroke="#fff" strokeWidth="1.2" className="bl-path"
-                onMouseMove={(e) => handleMove(e, bl.name, v)}
-                onMouseLeave={() => setTooltip(t => ({ ...t, visible: false }))} />
-              {v > 0 && (
-                <text x={bl.cx} y={bl.cy} fontSize="9" fill="#1a3a5c"
-                  textAnchor="middle" fontWeight="600">{v}</text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
-      <div className="map-legend">
-        {['0','1–3','4–6','7–10','11–15','15+'].map((l, i) => (
-          <div key={i} className="legend-item">
-            <div className="legend-swatch" style={{ background: COLOR_SCALE[i] }} />
-            <span>{l}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -271,7 +194,7 @@ const [data, setData] = useState({
           <div className="card-title">Fallzahlen nach Bundesland</div>
           {status === 'loading'
             ? <div className="skeleton skeleton-map" />
-            : <AustriaMap stateData={data.byState} />}
+            : <AustriaMapGeo stateData={data.byState} />}
         </div>
         <div className="card">
           <div className="card-title">Herkunftsländer (Reiseanamnese)</div>

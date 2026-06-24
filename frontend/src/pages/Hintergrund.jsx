@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Hintergrund.css';
 import Navbar from '../components/Navbar';
 
-// ─── Statische Daten ──────────────────────────────────────────
+// ─── Statische Daten (löschen)──────────────────────────────────────────
 const RESISTANCE = [
   { label: 'Fluconazol (Azole)',     pct: 90, color: '#c0392b' },
   { label: 'Voriconazol (Azole)',    pct: 75, color: '#e67e22' },
@@ -107,7 +107,7 @@ function TabErreger() {
       <div className="stat-row">
         <div className="stat-card"><div className="stat-val">2009</div><div className="stat-label">Erstbeschreibung in Japan</div></div>
         <div className="stat-card"><div className="stat-val">6</div><div className="stat-label">Bekannte phylogenetische Clades</div></div>
-        <div className="stat-card"><div className="stat-val">&gt;60%</div><div className="stat-label">Mortalität bei invasiver Infektion</div></div>
+        <div className="stat-card"><div className="stat-val">&gt; 60%</div><div className="stat-label">Mortalität bei invasiver Infektion</div></div>
       </div>
       <div className="card">
         <div className="card-title">Was ist Candida auris?</div>

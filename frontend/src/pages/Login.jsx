@@ -215,18 +215,6 @@ export default function Login() {
                 </button>
               </>
             )}
-            <button
-              type="button"
-              className="login-forgot-link"
-              onClick={() => {
-                setForgotMode(false);
-                setForgotName('');
-                setForgotMsg('');
-                setForgotError('');
-              }}
-            >
-              ← Zurück zur Anmeldung
-            </button>
           </div>
         )}
 

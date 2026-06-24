@@ -129,3 +129,16 @@
     padding: 8px 12px;
   }
 }
+
+/* Fallmeldung farblich hervorgehoben (nur öffentlicher Bereich) */
+.navbar-link.navbar-cta {
+  color: #e8dcc4;
+}
+.navbar-link.navbar-cta:hover {
+  color: #f5ecd8;
+  background: rgba(232, 220, 196, 0.12);
+}
+.navbar-link.navbar-cta.active {
+  color: #f5ecd8;
+  background: rgba(232, 220, 196, 0.18);
+}

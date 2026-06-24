@@ -19,8 +19,6 @@ const STATE_MAP = {
   Vorarlberg: 'Vorarlberg', Burgenland: 'Burgenland',
 };
 
-
-
 function MetricCard({ label, value, sub }) {
   return (
     <div className="metric-card">

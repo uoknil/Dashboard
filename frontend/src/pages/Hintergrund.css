@@ -1,25 +1,21 @@
 .info-page {
-  max-width: 860px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1.5rem 1rem 4rem;
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
-/* .topbar {
-  background: #1a3a5c; color: #e8f0f8; padding: 12px 20px; border-radius: 10px;
-  margin-bottom: 0; display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+
+/* Inhalt schmaler halten für bessere Lesbarkeit, Navbar + Hero bleiben volle Breite */
+.info-page > *:not(.navbar):not(.hero) {
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
 }
-.topbar-title { font-size: 17px; font-weight: 500; }
-.topbar-nav   { display: flex; gap: 6px; }
-.nav-btn {
-  font-size: 12px; padding: 4px 12px; border-radius: 20px;
-  border: 0.5px solid rgba(255,255,255,0.3);
-  background: transparent; color: #9bb8d4; cursor: pointer; font-family: inherit;
-} */
+
 .nav-btn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
-/* .nav-btn-active   { background: rgba(255,255,255,0.15); color: #e8f0f8; border-color: rgba(255,255,255,0.5); } */
+
 .hero {
   background: #1a3a5c;
   color: #e8f0f8;

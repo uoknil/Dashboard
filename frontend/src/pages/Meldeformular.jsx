@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { submitCase } from '../services/api';
 import './Meldeformular.css';
 import Navbar from '../components/Navbar';
@@ -123,6 +124,7 @@ export default function Meldeformular() {
   const [submitState,  setSubmitState]  = useState('idle');
   const [apiError,     setApiError]     = useState('');
   const [submissionId, setSubmissionId] = useState(null);
+  const navigate = useNavigate();
 
   const set = useCallback((key, value) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -260,7 +262,10 @@ export default function Meldeformular() {
             Ihre Meldung wurde per E-Mail weitergeleitet und wird nach fachlicher Prüfung übernommen.
           </p>
           {submissionId && <p className="success-id">Submission-ID: <strong>{submissionId}</strong></p>}
-          <button className="btn-secondary" onClick={reset}>Neue Meldung erstellen</button>
+          <div className="success-actions">
+            <button className="btn-primary" onClick={reset}>Neue Meldung erstellen</button>
+            <button className="btn-secondary" onClick={() => navigate('/')}>Zurück zum Dashboard</button>
+          </div>
         </div>
       </div>
     );

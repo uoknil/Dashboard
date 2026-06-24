@@ -78,6 +78,7 @@ export const fetchStatsByState = () => request('/api/stats/by-state');
 export const fetchStatsBySite = () => request('/api/stats/by-site');
 export const fetchStatsByClade = () => request('/api/stats/by-clade');
 export const fetchStatsByYear = () => request('/api/stats/by-year');
+export const fetchStatsByCountry = () => request('/api/stats/by-country');
 export const fetchLastUpdated = () => request('/api/meta/last-updated');
 
 // Fallmeldung absenden
@@ -115,3 +116,43 @@ export const approveSubmission = (id) =>
 
 export const rejectSubmission = (id) =>
   request(`/api/admin/submissions/${id}`, { method: 'DELETE' });
+
+// 5. ADMIN-BENUTZERVERWALTUNG
+
+// Alle Admin-Konten auflisten (für die Tabelle im Admin-Bereich)
+export const fetchUsers = () => request('/api/admin/users');
+
+// Neues Admin-Konto anlegen
+// Erwartet { username, password }
+export const createUser = (username, password) =>
+  request('/api/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  });
+
+// Konto aktivieren / deaktivieren
+// Erwartet { is_active: true/false }
+// Hinweis: Das Backend verhindert, dass man das eigene Konto deaktiviert
+export const toggleUser = (userId, isActive) =>
+  request(`/api/admin/users/${userId}/toggle`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_active: isActive }),
+  });
+
+// 6. PASSWORT ZURÜCKSETZEN (öffentlich, kein Token nötig)
+
+// Schritt 1: "Passwort vergessen" — schickt den Reset-Link an die Supervisor-E-Mail
+// Erwartet { username }
+export const forgotPassword = (username) =>
+  request('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ username }),
+  });
+
+// Schritt 2: Neues Passwort setzen über den weitergeleiteten Link
+// Erwartet { token, new_password }
+export const resetPassword = (token, newPassword) =>
+  request('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, new_password: newPassword }),
+  });

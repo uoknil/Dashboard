@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { submitCase } from '../services/api';
 import './Meldeformular.css';
 import Navbar from '../components/Navbar';

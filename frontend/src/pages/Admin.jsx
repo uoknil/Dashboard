@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   fetchSubmissions, updateSubmission, approveSubmission, rejectSubmission,
   fetchCases, updateCase, deleteCase,
+  fetchUsers, createUser, toggleUser,
 } from '../services/api';
 import Navbar from '../components/Navbar';
 // import { COUNTRY_OPTIONS } from '../constants/countries';
@@ -31,7 +32,7 @@ const CLADE_INFO = {
   'Clade III': 'Afrikanische Klade',
   'Clade IV':  'Südamerikanische Klade',
   'Clade V':   'Iranische Klade',
-  'Clade VI':  'Neu beschriebene Klade',
+  'Clade VI':  'Indo-Malaysische / Singapur-Klade',
 };
 const MIC_KEYS = ['mic_and','mic_mic','mic_cas','mic_flc','mic_pos','mic_vor','mic_5fc','mic_amb','mic_mgx'];
 const MIC_LABELS = {
@@ -109,7 +110,7 @@ function CaseDetailPanel({ item, type }) {
       <DetailField label="Reiseanamnese" value={item.travel_history} />
       <DetailField label="Auslandshospitalisierung" value={formatBool(item.hospitalized_abroad)} />
       <DetailField label="Krankenhaus / Ort" value={item.hospital_name} />
-      <DetailField label="Herkunftsland (travel_country)" value={item.travel_country} />
+      <DetailField label="Herkunftsland (origin_country)" value={item.origin_country} />
       <DetailField label="Antimykotische Therapie" value={formatBool(item.antifungal_therapy)} />
       <DetailField label="Antimykotika-Details" value={item.antifungal_therapy_details} />
       <DetailField label="Topische Therapie" value={formatBool(item.topical_therapy)} />
@@ -132,20 +133,23 @@ function CaseDetailPanel({ item, type }) {
   );
 }
 
+// Feld-Wrapper fürs Edit-Modal — außerhalb definiert, damit das
+// Eingabefeld beim Tippen nicht den Fokus verliert
+function ModalField({ id, label, full, children }) {
+  return (
+    <div className={`modal-field${full ? ' modal-field-full' : ''}`}>
+      <label htmlFor={`ef-${id}`}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+
 // ─── Edit Modal — zeigt jetzt ALLE editierbaren Felder ────────
 function EditModal({ item, type, onSave, onClose }) {
   const [form, setForm] = useState({ ...item });
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const isSub = type === 'submission';
-
-  function Field({ id, label, full, children }) {
-    return (
-      <div className={`modal-field${full ? ' modal-field-full' : ''}`}>
-        <label htmlFor={`ef-${id}`}>{label}</label>
-        {children}
-      </div>
-    );
-  }
 
   return (
     <div className="modal-bg" onClick={onClose}>
@@ -162,126 +166,122 @@ function EditModal({ item, type, onSave, onClose }) {
 
         <div className="modal-section-label">Basisdaten</div>
         <div className="modal-grid">
-          <Field id="state" label="Bundesland">
+          <ModalField id="state" label="Bundesland">
             <select id="ef-state" value={form.state || ''} onChange={(e) => set('state', e.target.value)}>
               <option value="">– wählen –</option>
               {STATE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
-          </Field>
-          <Field id="city" label="Stadt">
+          </ModalField>
+          <ModalField id="city" label="Stadt">
             <input id="ef-city" value={form.city || ''} onChange={(e) => set('city', e.target.value)} />
-          </Field>
-          <Field id="date_of_isolation" label="Datum (YYYY-MM-DD)">
+          </ModalField>
+          <ModalField id="date_of_isolation" label="Datum (YYYY-MM-DD)">
             <input id="ef-date_of_isolation" type="date" value={form.date_of_isolation || ''}
               onChange={(e) => set('date_of_isolation', e.target.value)} />
-          </Field>
-          <Field id="isolation_site" label="Isolationsort">
+          </ModalField>
+          <ModalField id="isolation_site" label="Isolationsort">
             <input id="ef-isolation_site" value={form.isolation_site || ''}
               onChange={(e) => set('isolation_site', e.target.value)} />
-          </Field>
-          <Field id="infection_type" label="Infektionstyp">
+          </ModalField>
+          <ModalField id="infection_type" label="Infektionstyp">
             <select id="ef-infection_type" value={form.infection_type || 'unknown'}
               onChange={(e) => set('infection_type', e.target.value)}>
               {INFECTION_OPTS.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
-          </Field>
-          <Field id="clade" label="Clade">
+          </ModalField>
+          <ModalField id="clade" label="Clade">
             <select id="ef-clade" value={form.clade || ''} onChange={(e) => set('clade', e.target.value)}>
               {CLADE_OPTS.map((o) => (
                 <option key={o} value={o}>{o ? `${o} – ${CLADE_INFO[o]}` : '– keine –'}</option>
               ))}
             </select>
-          </Field>
+          </ModalField>
         </div>
 
         <div className="modal-section-label">Klinische Angaben</div>
         <div className="modal-grid">
-          <Field id="gender" label="Geschlecht">
+          <ModalField id="gender" label="Geschlecht">
             <select id="ef-gender" value={form.gender || 'unknown'} onChange={(e) => set('gender', e.target.value)}>
               {GENDER_OPTS.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
-          </Field>
-          <Field id="age" label="Alter">
+          </ModalField>
+          <ModalField id="age" label="Alter">
             <input id="ef-age" type="number" value={form.age ?? ''}
               onChange={(e) => set('age', e.target.value ? parseInt(e.target.value) : null)} />
-          </Field>
-          <Field id="immune_status" label="Immunstatus">
+          </ModalField>
+          <ModalField id="immune_status" label="Immunstatus">
             <select id="ef-immune_status" value={form.immune_status || 'unknown'}
               onChange={(e) => set('immune_status', e.target.value)}>
               {IMMUNE_OPTS.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
-          </Field>
-          <Field id="medical_history" label="Grunderkrankung" full>
+          </ModalField>
+          <ModalField id="medical_history" label="Grunderkrankung" full>
             <textarea id="ef-medical_history" rows={2} value={form.medical_history || ''}
               onChange={(e) => set('medical_history', e.target.value)} />
-          </Field>
-          <Field id="travel_history" label="Reiseanamnese" full>
+          </ModalField>
+          <ModalField id="travel_history" label="Reiseanamnese" full>
             <textarea id="ef-travel_history" rows={2} value={form.travel_history || ''}
               onChange={(e) => set('travel_history', e.target.value)} />
-          </Field>
-          <Field id="relation_to" label="Bezug zu anderen Fällen" full>
+          </ModalField>
+          <ModalField id="relation_to" label="Bezug zu anderen Fällen" full>
             <input id="ef-relation_to" value={form.relation_to || ''}
               onChange={(e) => set('relation_to', e.target.value)} />
-          </Field>
+          </ModalField>
         </div>
 
         <div className="modal-section-label">Hospitalisierung &amp; Therapie</div>
         <div className="modal-grid">
-          <Field id="hospitalized_abroad" label="Auslandshospitalisierung">
+          <ModalField id="hospitalized_abroad" label="Auslandshospitalisierung">
             <select id="ef-hospitalized_abroad" value={form.hospitalized_abroad ? 'yes' : 'no'}
               onChange={(e) => set('hospitalized_abroad', e.target.value === 'yes')}>
               <option value="no">Nein</option>
               <option value="yes">Ja</option>
             </select>
-          </Field>
-          <Field id="hospital_name" label="Krankenhaus / Ort">
+          </ModalField>
+          <ModalField id="hospital_name" label="Krankenhaus / Ort">
             <input id="ef-hospital_name" value={form.hospital_name || ''}
               onChange={(e) => set('hospital_name', e.target.value)} />
-          </Field>
-          <Field id="travel_country" label="Herkunftsland (für Weltkarte)">
-            <select id="ef-travel_country" value={form.travel_country || ''}
-              onChange={(e) => set('travel_country', e.target.value)}>
-              <option value="">– keine Angabe –</option>
-              {COUNTRY_OPTIONS.map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
-              ))}
-            </select>
-          </Field>
-          <Field id="antifungal_therapy" label="Antimykotische Therapie">
+          </ModalField>
+          <ModalField id="origin_country" label="Herkunftsland (manuelle Eingabe für Weltkarte)">
+            <input id="ef-origin_country" value={form.origin_country || ''}
+              onChange={(e) => set('origin_country', e.target.value)}
+              placeholder="z. B. Indien" />
+          </ModalField>
+          <ModalField id="antifungal_therapy" label="Antimykotische Therapie">
             <select id="ef-antifungal_therapy" value={form.antifungal_therapy ? 'yes' : 'no'}
               onChange={(e) => set('antifungal_therapy', e.target.value === 'yes')}>
               <option value="no">Nein</option>
               <option value="yes">Ja</option>
             </select>
-          </Field>
-          <Field id="antifungal_therapy_details" label="Antimykotika-Details">
+          </ModalField>
+          <ModalField id="antifungal_therapy_details" label="Antimykotika-Details">
             <input id="ef-antifungal_therapy_details" value={form.antifungal_therapy_details || ''}
               onChange={(e) => set('antifungal_therapy_details', e.target.value)} />
-          </Field>
-          <Field id="topical_therapy" label="Topische Therapie">
+          </ModalField>
+          <ModalField id="topical_therapy" label="Topische Therapie">
             <select id="ef-topical_therapy" value={form.topical_therapy ? 'yes' : 'no'}
               onChange={(e) => set('topical_therapy', e.target.value === 'yes')}>
               <option value="no">Nein</option>
               <option value="yes">Ja</option>
             </select>
-          </Field>
-          <Field id="topical_therapy_details" label="Topische Details">
+          </ModalField>
+          <ModalField id="topical_therapy_details" label="Topische Details">
             <input id="ef-topical_therapy_details" value={form.topical_therapy_details || ''}
               onChange={(e) => set('topical_therapy_details', e.target.value)} />
-          </Field>
-          <Field id="additional_info" label="Zusatzinfos" full>
+          </ModalField>
+          <ModalField id="additional_info" label="Zusatzinfos" full>
             <textarea id="ef-additional_info" rows={2} value={form.additional_info || ''}
               onChange={(e) => set('additional_info', e.target.value)} />
-          </Field>
+          </ModalField>
         </div>
 
         <div className="modal-section-label">Resistenzdaten — MIC-Werte (mg/L)</div>
         <div className="modal-grid modal-grid-mic">
           {MIC_KEYS.map((k) => (
-            <Field key={k} id={k} label={MIC_LABELS[k]}>
+            <ModalField key={k} id={k} label={MIC_LABELS[k]}>
               <input id={`ef-${k}`} type="number" step="0.001" min="0" value={form[k] ?? ''}
                 onChange={(e) => set(k, e.target.value === '' ? null : parseFloat(e.target.value))} />
-            </Field>
+            </ModalField>
           ))}
         </div>
 
@@ -332,7 +332,7 @@ function SubmissionCard({ sub, onApprove, onEdit, onReject, loading }) {
       <div className="sub-details">
         <div className="sub-detail-row"><span className="sub-detail-key">Reiseanamnese</span><span>{sub.travel_history||'—'}</span></div>
         {sub.hospitalized_abroad && <div className="sub-detail-row"><span className="sub-detail-key">Auslandshosp.</span><span>{sub.hospital_name||'—'}</span></div>}
-        {sub.travel_country && <div className="sub-detail-row"><span className="sub-detail-key">Herkunftsland</span><span>{sub.travel_country}</span></div>}
+        {sub.origin_country && <div className="sub-detail-row"><span className="sub-detail-key">Herkunftsland</span><span>{sub.origin_country}</span></div>}
         <div className="sub-detail-row"><span className="sub-detail-key">Grunderkrankung</span><span>{sub.medical_history||'—'}</span></div>
         {sub.antifungal_therapy && <div className="sub-detail-row"><span className="sub-detail-key">Antimykotika</span><span>{sub.antifungal_therapy_details||'—'}</span></div>}
         {sub.topical_therapy && <div className="sub-detail-row"><span className="sub-detail-key">Topische Therapie</span><span>{sub.topical_therapy_details||'—'}</span></div>}
@@ -410,6 +410,142 @@ function CasesTable({ cases, onEdit, onDelete, expandedId, onToggleExpand }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+// ─── Benutzerverwaltung (Admin-Konten) ───────────────────────
+function UserManagement({ currentUsername, safeApi, showToast }) {
+  const [users,      setUsers]      = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [newName,    setNewName]    = useState('');
+  const [newPass,    setNewPass]    = useState('');
+  const [formError,  setFormError]  = useState('');
+  const [busy,       setBusy]       = useState(false);
+
+  // Benutzerliste laden
+  useEffect(() => {
+    safeApi(async () => {
+      const data = await fetchUsers();
+      if (data) setUsers(data);
+    }).finally(() => setLoading(false));
+  }, [safeApi]);
+
+  // Konto aktivieren / deaktivieren
+  async function handleToggle(user) {
+    setBusy(true);
+    try {
+      const updated = await safeApi(() => toggleUser(user.id, !user.is_active));
+      if (updated) {
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+        showToast(`Konto "${user.username}" ist jetzt ${updated.is_active ? 'aktiv' : 'deaktiviert'}.`);
+      }
+    } catch (err) {
+      showToast(err.status === 400 ? 'Sie können Ihr eigenes Konto nicht deaktivieren.' : 'Fehler beim Ändern des Kontos.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Neues Admin-Konto anlegen
+  async function handleCreate() {
+    setFormError('');
+    if (newName.trim().length < 3) { setFormError('Benutzername: mindestens 3 Zeichen.'); return; }
+    if (newPass.length < 6)        { setFormError('Passwort: mindestens 6 Zeichen.'); return; }
+
+    setBusy(true);
+    try {
+      const created = await safeApi(() => createUser(newName.trim(), newPass));
+      if (created) {
+        setUsers((prev) => [...prev, created]);
+        setNewName('');
+        setNewPass('');
+        showToast(`Admin-Konto "${created.username}" angelegt ✓`);
+      }
+    } catch (err) {
+      setFormError(err.status === 400 ? 'Benutzername bereits vergeben.' : 'Fehler beim Anlegen des Kontos.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div role="tabpanel">
+      {/* Konto anlegen */}
+      <div className="card">
+        <div className="card-title">Neues Admin-Konto anlegen</div>
+        <div className="modal-grid">
+          <div className="modal-field">
+            <label htmlFor="nu-username">Benutzername</label>
+            <input id="nu-username" value={newName}
+              onChange={(e) => { setNewName(e.target.value); setFormError(''); }}
+              placeholder="z. B. neuer_arzt" autoComplete="off" />
+          </div>
+          <div className="modal-field">
+            <label htmlFor="nu-password">Passwort</label>
+            <input id="nu-password" type="password" value={newPass}
+              onChange={(e) => { setNewPass(e.target.value); setFormError(''); }}
+              placeholder="mindestens 6 Zeichen" autoComplete="new-password" />
+          </div>
+        </div>
+        {formError && <div className="login-err-msg" style={{ marginTop: 8 }}>{formError}</div>}
+        <div className="modal-actions">
+          <button className="btn-primary" onClick={handleCreate} disabled={busy}>
+            Konto anlegen
+          </button>
+        </div>
+      </div>
+
+      {/* Bestehende Konten */}
+      <div className="card">
+        <div className="card-title">
+          Bestehende Admin-Konten
+          {!loading && <span className="card-count">{users.length} Konten</span>}
+        </div>
+        {loading ? (
+          <div className="loading-state">Konten werden geladen…</div>
+        ) : users.length === 0 ? (
+          <div className="empty-state">Keine Konten gefunden.</div>
+        ) : (
+          <div className="table-wrapper">
+            <table className="cases-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Benutzername</th><th>Status</th><th>Aktion</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td className="td-muted">#{u.id}</td>
+                    <td>
+                      {u.username}
+                      {u.username === currentUsername && (
+                        <span className="meta-chip meta-blue" style={{ marginLeft: 8 }}>Sie</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`type-badge ${u.is_active ? 'badge-col' : 'badge-unk'}`}>
+                        {u.is_active ? 'aktiv' : 'deaktiviert'}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className={`tbl-btn${u.is_active ? ' tbl-btn-danger' : ''}`}
+                        onClick={() => handleToggle(u)}
+                        disabled={busy || u.username === currentUsername}
+                        title={u.username === currentUsername ? 'Eigenes Konto kann nicht deaktiviert werden' : ''}
+                      >
+                        {u.is_active ? 'Deaktivieren' : 'Aktivieren'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -556,6 +692,7 @@ export default function Admin() {
         {[
           { id:'submissions', label:'Offene Meldungen', count: submissions.length },
           { id:'cases',       label:'Falldaten',        count: null },
+          { id:'users',       label:'Benutzer',         count: null },
         ].map((t) => (
           <button key={t.id} role="tab" aria-selected={activeTab===t.id}
             className={`admin-tab${activeTab===t.id?' active':''}`}
@@ -601,6 +738,14 @@ export default function Admin() {
             ▸ anklicken zeigt alle Datenfelder dieses Falls (Alter, MIC-Werte, Therapie, etc.)
           </div>
         </div>
+      )}
+
+      {activeTab === 'users' && (
+        <UserManagement
+          currentUsername={username}
+          safeApi={safeApi}
+          showToast={showToast}
+        />
       )}
 
       {editItem && (

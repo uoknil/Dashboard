@@ -3,7 +3,8 @@ CLADE_MAP = {
     "Clade II": "East Asian",
     "Clade III": "African",
     "Clade IV": "South American",
-    "Clade V": "Iranian"
+    "Clade V": "Iranian",
+    "Clade VI": "Singaporean"
 }
 
 

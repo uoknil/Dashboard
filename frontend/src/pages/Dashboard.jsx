@@ -3,9 +3,10 @@ import { Chart as ChartJS, CategoryScale, LinearScale,
   PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { fetchStatsByState, fetchStatsBySite,
-  fetchStatsByClade, fetchStatsByYear, fetchLastUpdated } from '../services/api';
+  fetchStatsByClade, fetchStatsByYear, fetchStatsByCountry, fetchLastUpdated } from '../services/api';
 import './Dashboard.css';
 import Navbar from '../components/Navbar';
+import WorldMap from '../components/WorldMap';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement,
   LineElement, Title, Tooltip, Legend, Filler);
@@ -150,8 +151,8 @@ function TimelineChart({ yearData }) {
 }
 
 export default function Dashboard() {
-  const [data, setData] = useState({
-    byState: {}, bySite: {}, byClade: {}, byYear: {}, lastUpdated: null,
+const [data, setData] = useState({
+    byState: {}, bySite: {}, byClade: {}, byYear: {}, byCountry: {}, lastUpdated: null,
   });
   const [status, setStatus] = useState('loading');
   const [selectedYear, setSelectedYear] = useState('all');
@@ -160,11 +161,11 @@ export default function Dashboard() {
     async function load() {
       setStatus('loading');
       try {
-        const [byState, bySite, byClade, byYear, meta] = await Promise.all([
+        const [byState, bySite, byClade, byYear, byCountry, meta] = await Promise.all([
           fetchStatsByState(), fetchStatsBySite(),
-          fetchStatsByClade(), fetchStatsByYear(), fetchLastUpdated(),
+          fetchStatsByClade(), fetchStatsByYear(), fetchStatsByCountry(), fetchLastUpdated(),
         ]);
-        setData({ byState, bySite, byClade, byYear,
+        setData({ byState, bySite, byClade, byYear, byCountry,
           lastUpdated: meta.last_updated });
         setStatus('ok');
       } catch (e) {
@@ -273,14 +274,21 @@ export default function Dashboard() {
             : <AustriaMap stateData={data.byState} />}
         </div>
         <div className="card">
-          <div className="card-title">Zeitlicher Verlauf (kumulativ)</div>
-          <div className="chart-wrapper">
-            {status === 'loading'
-              ? <div className="skeleton skeleton-chart" />
-              : Object.keys(filteredYearData).length > 0
-                ? <TimelineChart yearData={filteredYearData} />
-                : <div className="no-data">Keine Daten verfügbar</div>}
-          </div>
+          <div className="card-title">Herkunftsländer (Reiseanamnese)</div>
+          {status === 'loading'
+            ? <div className="skeleton skeleton-map" />
+            : <WorldMap countryData={data.byCountry} />}
+        </div>
+      </div>
+
+      <div className="card timeline-card">
+        <div className="card-title">Zeitlicher Verlauf (kumulativ)</div>
+        <div className="chart-wrapper">
+          {status === 'loading'
+            ? <div className="skeleton skeleton-chart" />
+            : Object.keys(filteredYearData).length > 0
+              ? <TimelineChart yearData={filteredYearData} />
+              : <div className="no-data">Keine Daten verfügbar</div>}
         </div>
       </div>
 

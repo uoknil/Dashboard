@@ -316,4 +316,20 @@
   font-size: 13px;
   color: #6b7280;
   margin-top: 3px;
+
+  /* ── Weltkarte ── */
+  .worldmap-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  .worldmap-wrapper svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Timeline unter den Karten — etwas Abstand nach oben */
+  .timeline-card {
+    margin-top: 14px;
+  }
 }

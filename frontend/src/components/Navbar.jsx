@@ -66,22 +66,14 @@ export default function Navbar() {
           </NavLink>
         )}
 
-        <div className="navbar-right">
-          {isAuthenticated ? (
-            <>
-              <span className="navbar-user">{username}</span>
-              <button className="navbar-logout" onClick={handleLogout}>
-                Abmelden
-              </button>
-            </>
-          ) : (
-            <NavLink to="/login"
-              className={({ isActive }) => `navbar-link navbar-login-btn${isActive ? ' active' : ''}`}
-              onClick={() => setMenuOpen(false)}>
-              Admin-Login
-            </NavLink>
-          )}
-        </div>
+        {isAuthenticated && (
+          <div className="navbar-right">
+            <span className="navbar-user">{username}</span>
+            <button className="navbar-logout" onClick={handleLogout}>
+              Abmelden
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

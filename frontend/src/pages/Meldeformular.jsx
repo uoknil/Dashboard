@@ -308,31 +308,29 @@ export default function Meldeformular() {
                     ['Tyrol','Tirol'],['Salzburg','Salzburg'],['Carinthia','Kärnten'],
                     ['Vorarlberg','Vorarlberg'],['Burgenland','Burgenland'],
                   ]} />
-                <div className="field-hint">{t('form_state_hint')}</div>
+                
               </Field>
-              <Field id="city" label={t('form_city')} required error={errors.city}
-                hint={t('form_city_hint')}>
+              <Field id="city" label={t('form_city')} required error={errors.city}>
                 <input id="city" type="text" value={form.city}
                   className={errors.city ? 'input-error' : ''}
                   onChange={(e) => set('city', e.target.value)}
                   placeholder={t('form_city_ph')} />
               </Field>
               <Field id="date_of_isolation" label={t('form_date')} required
-                error={errors.date_of_isolation} hint={t('form_date_hint')}>
+                error={errors.date_of_isolation}>
                 <input id="date_of_isolation" type="date" value={form.date_of_isolation}
                   max={new Date().toISOString().split('T')[0]}
                   className={errors.date_of_isolation ? 'input-error' : ''}
                   onChange={(e) => set('date_of_isolation', e.target.value)} />
               </Field>
               <Field id="isolation_site" label={t('form_site')} required
-                error={errors.isolation_site} hint={t('form_site_hint')}>
+                error={errors.isolation_site}>
                 <input id="isolation_site" type="text" value={form.isolation_site}
                   className={errors.isolation_site ? 'input-error' : ''}
                   onChange={(e) => set('isolation_site', e.target.value)}
                   placeholder={t('form_site_ph')} />
               </Field>
-              <Field id="infection_type" label={t('form_inftype')} required fullWidth
-                hint='"infection" | "colonization" | "unknown"'>
+              <Field id="infection_type" label={t('form_inftype')} required fullWidth>
                 <RadioGroup name="infection_type" value={form.infection_type}
                   onChange={(v) => set('infection_type', v)}
                   options={[['infection',t('form_inftype_infection')],['colonization',t('form_inftype_colonization')],['unknown',t('form_unknown')]]} />
@@ -362,20 +360,18 @@ export default function Meldeformular() {
           <div className="panel">
             <div className="panel-title">{t('form_p2_title')} <span className="panel-badge">{t('form_badge_anon')}</span></div>
             <div className="field-grid">
-              <Field id="gender" label={t('form_gender')} required error={errors.gender}
-                hint='"male" | "female" | "divers" | "inter" | "other"'>
+              <Field id="gender" label={t('form_gender')} required error={errors.gender}>
                 <SelectField id="gender" value={form.gender} onChange={(v) => set('gender', v)}
                   error={!!errors.gender}
                   placeholder={t('form_select_ph')}
                   options={[['male',t('form_gender_male')],['female',t('form_gender_female')],['other',t('form_gender_divers')],['intersex',t('form_gender_inter')],['unknown',t('form_unknown')]]} />
               </Field>
-              <Field id="age" label={t('form_age')} hint={t('form_age_hint')} error={errors.age}>
+              <Field id="age" label={t('form_age')} error={errors.age}>
                 <input id="age" type="number" value={form.age} min="1" max="119"
                   className={errors.age ? 'input-error' : ''}
                   onChange={(e) => set('age', e.target.value)} placeholder={t('form_age_ph')} />
               </Field>
-              <Field id="immune_status" label={t('form_immune')} fullWidth
-                hint='"immunocompetent" | "immunocompromised" | "unknown"'>
+              <Field id="immune_status" label={t('form_immune')} fullWidth>
                 <RadioGroup name="immune_status" value={form.immune_status}
                   onChange={(v) => set('immune_status', v)}
                   options={[['immunocompetent',t('form_immune_competent')],['immunocompromised',t('form_immune_compromised')],['unknown',t('form_unknown')]]} />

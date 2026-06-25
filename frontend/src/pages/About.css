@@ -193,3 +193,17 @@
     padding: 24px 18px;
   }
 }
+
+.about-notice {
+  background: #eff6ff;
+  border: 0.5px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #1e3a5f;
+  line-height: 1.65;
+  margin-top: 14px;
+}
+.about-notice strong {
+  color: #1a3a5c;
+}

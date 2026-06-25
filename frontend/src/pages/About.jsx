@@ -130,6 +130,10 @@ export default function About() {
           <div className="impressum-label">{t('about_imp_liability')}</div>
           <p className="impressum-text">{t('about_imp_liability_text')}</p>
         </div>
+        <div className="about-notice" style={{ marginTop: 14 }}>
+        <strong>{t('about_privacy_notice_title')}</strong><br />
+        {t('about_privacy_notice_text')}
+      </div>
       </div>
     </div>
   );

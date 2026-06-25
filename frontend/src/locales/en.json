@@ -47,6 +47,8 @@
   "about_imp_copyright_text": "All content is protected by copyright. Use and distribution only with the explicit permission of the publishers.",
   "about_imp_liability": "Liability",
   "about_imp_liability_text": "The content of this dashboard serves exclusively scientific and epidemiological purposes. No treatment recommendations or clinical guidelines are provided. We assume no liability for externally linked content.",
+  "about_privacy_notice_title": "Note",
+  "about_privacy_notice_text": "The final privacy policy will be provided by the responsible organization before the public go-live and inserted here.",
 
   "dash_title": "Candida auris Surveillance Dashboard · Austria",
   "dash_sub": "Aggregated, anonymized case data at the state level",

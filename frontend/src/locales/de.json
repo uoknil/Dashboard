@@ -47,7 +47,9 @@
   "about_imp_copyright_text": "Alle Inhalte sind urheberrechtlich geschützt. Nutzung und Weitergabe nur mit ausdrücklicher Genehmigung der Herausgeber.",
   "about_imp_liability": "Haftung",
   "about_imp_liability_text": "Die Inhalte dieses Dashboards dienen ausschließlich wissenschaftlichen und epidemiologischen Zwecken. Es werden keine Therapieempfehlungen oder klinischen Leitlinien bereitgestellt. Für externe verlinkte Inhalte übernehmen wir keine Haftung.",
-
+  "about_privacy_notice_title": "Hinweis",
+  "about_privacy_notice_text": "Die endgültige Datenschutzerklärung wird vor dem öffentlichen Go-Live durch die verantwortliche Organisation bereitgestellt und hier eingefügt.",
+  
   "dash_title": "Candida auris Surveillance Dashboard · Österreich",
   "dash_sub": "Aggregierte, anonymisierte Falldaten auf Bundeslandebene",
   "dash_status_loading": "Daten werden geladen…",

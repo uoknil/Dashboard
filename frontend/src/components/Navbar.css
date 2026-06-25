@@ -142,3 +142,20 @@
   color: #f5ecd8;
   background: rgba(232, 220, 196, 0.18);
 }
+
+/* Sprach-Umschalter */
+.navbar-lang {
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
+  color: #e8f0f8;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.navbar-lang:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

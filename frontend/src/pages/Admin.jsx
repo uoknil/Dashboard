@@ -159,9 +159,9 @@ function EditModal({ item, type, onSave, onClose }) {
         <div className="modal-title">
           <span>
             {isSub ? t('admin_edit_sub') : t('admin_edit_case')}
-            <span className="modal-endpoint">
+            {/* <span className="modal-endpoint">
               {isSub ? `PATCH /api/admin/submissions/${item.id}` : `PATCH /api/admin/cases/${item.id}`}
-            </span>
+            </span> */}
           </span>
           <button className="modal-close" onClick={onClose} aria-label={t('admin_close')}>×</button>
         </div>

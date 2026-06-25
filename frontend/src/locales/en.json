@@ -320,6 +320,7 @@
   "form_err_validation": "Validation error: {{msg}}",
   "form_err_generic": "Error: {{msg}}",
 
+
   "admin_cancel": "Cancel",
   "admin_confirm": "Confirm",
   "admin_save": "Save",

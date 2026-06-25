@@ -1,21 +1,23 @@
 
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
+import { useTranslation } from 'react-i18next';
 import './About.css';
 
 const SCIENTIFIC_TEAM = [
-  { name: 'Dr. Kathrin Spettel, MSc BSc', role: 'Inhaltlich verantwortlich · Wissenschaftliche Leitung', photo: '/about/kathrin.jpg' },
-  { name: 'Prof. Birgit Willinger',       role: 'Wissenschaftliche Leitung',                              photo: '/about/birgit.jpg' },
-  { name: 'Richard Kriz, MSc BSc',        role: 'Wissenschaftliche Betreuung',                            photo: '/about/richard.jpg' },
+  { name: 'Dr. Kathrin Spettel, MSc BSc', roleKey: 'about_role_kathrin', photo: '/about/kathrin.jpg' },
+  { name: 'Prof. Birgit Willinger',       roleKey: 'about_role_birgit',  photo: '/about/birgit.jpg' },
+  { name: 'Richard Kriz, MSc BSc',        roleKey: 'about_role_richard', photo: '/about/richard.jpg' },
 ];
 
 const DEVELOPERS = [
-  { name: 'Cristina Postoronca',     role: 'Backend-Entwicklung',                  photo: '/about/cristina.jpg' },
-  { name: 'Oyu-Erdene Khurelbaatar', role: 'Frontend-Entwicklung',                 photo: '/about/oyu-erdene.jpg' },
-  { name: 'Linlin Kou',              role: 'Projektmanagment',                     photo: '/about/linlin.jpg' },
+  { name: 'Cristina Postoronca',     roleKey: 'about_role_backend',  photo: '/about/cristina.jpg' },
+  { name: 'Oyu-Erdene Khurelbaatar', roleKey: 'about_role_frontend', photo: '/about/oyu-erdene.jpg' },
+  { name: 'Linlin Kou',              roleKey: 'about_role_pm',       photo: '/about/linlin.jpg' },
 ];
 
-function PersonCard({ name, role, photo }) {
+function PersonCard({ name, roleKey, photo }) {
+  const { t } = useTranslation();
   const [failed, setFailed] = useState(false);
   const initials = name
     .replace(/^(Dr\.|Prof\.)\s*/, '')
@@ -36,7 +38,7 @@ function PersonCard({ name, role, photo }) {
         )}
       </div>
       <div className="person-name">{name}</div>
-      <div className="person-role">{role}</div>
+      <div className="person-role">{t(roleKey)}</div>
     </div>
   );
 }
@@ -53,48 +55,46 @@ function LogoSlot({ src, alt, fallbackLabel }) {
 }
 
 export default function About() {
+  const { t } = useTranslation();
   return (
     <div className="about-page">
       <Navbar />
 
       <div className="about-hero">
-        <div className="about-hero-eyebrow">Kooperationsprojekt</div>
-        <h1 className="about-hero-title">Team &amp; Impressum</h1>
-        <p className="about-hero-sub">
-          Das Candida auris Dashboard Österreich ist ein gemeinsames Projekt der
-          Medizinischen Universität Wien und der Hochschule Campus Wien.
-        </p>
+        <div className="about-hero-eyebrow">{t('about_eyebrow')}</div>
+        <h1 className="about-hero-title">{t('about_title')}</h1>
+        <p className="about-hero-sub">{t('about_sub')}</p>
       </div>
 
       <div className="card">
-        <div className="card-title">Institutionen</div>
+        <div className="card-title">{t('about_institutions')}</div>
         <div className="logos-row">
           <LogoSlot src="/about/meduni.png" alt="Medizinische Universität Wien"
-            fallbackLabel="Logo Med Uni Wien hier einfügen (public/about/logo-meduni.svg)" />
+            fallbackLabel="Logo Med Uni Wien" />
           <LogoSlot src="/about/hcw.png" alt="Hochschule Campus Wien"
-            fallbackLabel="Logo HCW hier einfügen (public/about/logo-hcw.svg)" />
+            fallbackLabel="Logo HCW Wien" />
         </div>
       </div>
 
       <div className="card">
-        <div className="card-title">Projektteam</div>
+        <div className="card-title">{t('about_project_team')}</div>
         <div className="person-grid">
           {SCIENTIFIC_TEAM.map((p) => <PersonCard key={p.name} {...p} />)}
         </div>
       </div>
 
       <div className="card">
-        <div className="card-title">Entwicklungsteam</div>
+        <div className="card-title">{t('about_dev_team')}</div>
         <div className="person-grid">
           {DEVELOPERS.map((p) => <PersonCard key={p.name} {...p} />)}
         </div>
       </div>
 
       <div className="card impressum-card">
-        <div className="card-title">Impressum</div>
+        <div className="card-title">{t('about_imprint')}</div>
 
         <div className="impressum-block">
-          <div className="impressum-label">Herausgeber</div>
+          <div className="impressum-label">{t('about_imp_publisher')}</div>
           <p className="impressum-org">
             Medizinische Universität Wien<br />
             Abteilung für Klinische Mikrobiologie<br />
@@ -109,7 +109,7 @@ export default function About() {
         </div>
 
         <div className="impressum-block">
-          <div className="impressum-label">Inhaltlich verantwortlich</div>
+          <div className="impressum-label">{t('about_imp_responsible')}</div>
           <p className="impressum-org">
             Kathrin Spettel<br />
             <a href="mailto:kathrin.spettel@hcw.ac.at">kathrin.spettel@hcw.ac.at</a>
@@ -117,32 +117,18 @@ export default function About() {
         </div>
 
         <div className="impressum-block">
-          <div className="impressum-label">Zweck</div>
-          <p className="impressum-text">
-            Dieses Dashboard dient der wissenschaftlichen Surveillance und
-            Bewusstseinsbildung zu Candidozyma auris (C.&nbsp;auris) in Österreich
-            und wird als Kooperationsprojekt der MedUni Wien und der Hochschule
-            Campus Wien betrieben. Es enthält keinerlei klinische
-            Therapieempfehlungen oder medizinische Handlungsanweisungen.
-          </p>
+          <div className="impressum-label">{t('about_imp_purpose')}</div>
+          <p className="impressum-text">{t('about_imp_purpose_text')}</p>
         </div>
 
         <div className="impressum-block">
-          <div className="impressum-label">Urheberrecht</div>
-          <p className="impressum-text">
-            Alle Inhalte sind urheberrechtlich geschützt. Nutzung und Weitergabe
-            nur mit ausdrücklicher Genehmigung der Herausgeber.
-          </p>
+          <div className="impressum-label">{t('about_imp_copyright')}</div>
+          <p className="impressum-text">{t('about_imp_copyright_text')}</p>
         </div>
 
         <div className="impressum-block">
-          <div className="impressum-label">Haftung</div>
-          <p className="impressum-text">
-            Die Inhalte dieses Dashboards dienen ausschließlich wissenschaftlichen
-            und epidemiologischen Zwecken. Es werden keine Therapieempfehlungen
-            oder klinischen Leitlinien bereitgestellt. Für externe verlinkte
-            Inhalte übernehmen wir keine Haftung.
-          </p>
+          <div className="impressum-label">{t('about_imp_liability')}</div>
+          <p className="impressum-text">{t('about_imp_liability_text')}</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale,
   PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line } from 'react-chartjs-2';
@@ -43,17 +44,17 @@ function HorizontalBar({ label, value, max, color }) {
   );
 }
 
-function TimelineChart({ yearData }) {
+function TimelineChart({ yearData, t }) {
   const years = Object.keys(yearData).sort();
   const cumData = years.reduce((acc, y) => {
   const last = acc.length > 0 ? acc[acc.length - 1] : 0;
   return [...acc, last + (yearData[y] || 0)];
 }, []);
-  
+
   const chartData = {
     labels: years,
     datasets: [{
-      label: 'Fälle kumulativ', data: cumData,
+      label: t('dash_cases_cumulative'), data: cumData,
       borderColor: '#2878b8', backgroundColor: 'rgba(40,120,184,0.08)',
       fill: true, tension: 0.4, pointRadius: 5,
       pointBackgroundColor: '#1a3a5c', borderWidth: 2,
@@ -72,7 +73,8 @@ function TimelineChart({ yearData }) {
 }
 
 export default function Dashboard() {
-const [data, setData] = useState({
+  const { t } = useTranslation();
+  const [data, setData] = useState({
     byState: {}, bySite: {}, byClade: {}, byYear: {}, byCountry: {}, lastUpdated: null,
   });
   const [status, setStatus] = useState('loading');
@@ -115,71 +117,51 @@ const [data, setData] = useState({
 
   return (
     <div className="dashboard-page">
-{/*       <header className="topbar">
-        <div>
-          <div className="topbar-title">Candida auris Surveillance Dashboard · Österreich</div>
-          <div className="topbar-sub">Aggregierte, anonymisierte Falldaten auf Bundeslandebene</div>
-        </div>
-        <div className="topbar-right">
-          <div className="status-row">
-            <span className={`status-dot status-${status}`} />
-            <span className="status-text">
-              {status === 'loading' && 'Daten werden geladen…'}
-              {status === 'ok'      && 'Aktuell'}
-              {status === 'error'   && 'API nicht erreichbar'}
-            </span>
-          </div>
-          <div className="topbar-sub">
-            {data.lastUpdated ? `Letzte Aktualisierung: ${data.lastUpdated}` : '—'}
-          </div>
-        </div>
-      </header> */}
-
       <Navbar />
 <div className="dashboard-hero">
   <div>
     <div className="dashboard-hero-title">
-      Candida auris Surveillance Dashboard · Österreich
+      {t('dash_title')}
     </div>
     <div className="dashboard-hero-sub">
-      Aggregierte, anonymisierte Falldaten auf Bundeslandebene
+      {t('dash_sub')}
     </div>
   </div>
   <div className="status-row">
     <span className={`status-dot status-${status}`} />
     <span className="status-text">
-      {status === 'loading' && 'Daten werden geladen…'}
-      {status === 'ok'      && 'Aktuell'}
-      {status === 'error'   && 'API nicht erreichbar'}
+      {status === 'loading' && t('dash_status_loading')}
+      {status === 'ok'      && t('dash_status_ok')}
+      {status === 'error'   && t('dash_status_error')}
     </span>
     <span className="topbar-sub">
-      {data.lastUpdated ? `Letzte Aktualisierung: ${data.lastUpdated}` : '—'}
+      {data.lastUpdated ? t('dash_last_updated', { date: data.lastUpdated }) : '—'}
     </span>
   </div>
 </div>
 
       {status === 'error' && (
         <div className="error-banner" role="alert">
-          Backend nicht erreichbar. Prüfe ob der Server läuft:&nbsp;
+          {t('dash_error_banner')}&nbsp;
           <code>{import.meta.env.VITE_API_URL || 'http://localhost:8000'}</code>
         </div>
       )}
 
       <div className="metrics-grid">
-        <MetricCard label="Fälle gesamt"          value={totalCases || '—'} sub="seit Erfassungsbeginn" />
-        <MetricCard label="Bundesländer betroffen" value={affectedStates || '—'} sub="von 9 Bundesländern" />
-        <MetricCard label="Häufigste Lokalisation"
+        <MetricCard label={t('dash_metric_total')}          value={totalCases || '—'} sub={t('dash_metric_total_sub')} />
+        <MetricCard label={t('dash_metric_states')} value={affectedStates || '—'} sub={t('dash_metric_states_sub')} />
+        <MetricCard label={t('dash_metric_site')}
           value={topSite ? topSite[0].slice(0,14) : '—'}
-          sub={topSite ? `${topSite[1]} Fälle` : '—'} />
-        <MetricCard label="Häufigste Clade"
+          sub={topSite ? t('dash_cases_count', { count: topSite[1] }) : '—'} />
+        <MetricCard label={t('dash_metric_clade')}
           value={topClade ? topClade[0] : '—'}
-          sub={topClade ? `${topClade[1]} Fälle` : '—'} />
+          sub={topClade ? t('dash_cases_count', { count: topClade[1] }) : '—'} />
       </div>
 
       <div className="filter-bar">
-        <span className="filter-label">Jahr:</span>
+        <span className="filter-label">{t('dash_year')}</span>
         <button className={`filter-btn${selectedYear==='all'?' active':''}`}
-          onClick={() => setSelectedYear('all')}>Alle Jahre</button>
+          onClick={() => setSelectedYear('all')}>{t('dash_all_years')}</button>
         {years.map(y => (
           <button key={y}
             className={`filter-btn${selectedYear===y?' active':''}`}
@@ -189,13 +171,13 @@ const [data, setData] = useState({
 
       <div className="main-grid">
         <div className="card">
-          <div className="card-title">Fallzahlen nach Bundesland</div>
+          <div className="card-title">{t('dash_map_states')}</div>
           {status === 'loading'
             ? <div className="skeleton skeleton-map" />
             : <AustriaMapGeo stateData={data.byState} />}
         </div>
         <div className="card">
-          <div className="card-title">Herkunftsländer (Reiseanamnese)</div>
+          <div className="card-title">{t('dash_map_countries')}</div>
           {status === 'loading'
             ? <div className="skeleton skeleton-map" />
             : <WorldMap countryData={data.byCountry} />}
@@ -203,33 +185,33 @@ const [data, setData] = useState({
       </div>
 
       <div className="card timeline-card">
-        <div className="card-title">Zeitlicher Verlauf (kumulativ)</div>
+        <div className="card-title">{t('dash_timeline')}</div>
         <div className="chart-wrapper">
           {status === 'loading'
             ? <div className="skeleton skeleton-chart" />
             : Object.keys(filteredYearData).length > 0
-              ? <TimelineChart yearData={filteredYearData} />
-              : <div className="no-data">Keine Daten verfügbar</div>}
+              ? <TimelineChart yearData={filteredYearData} t={t} />
+              : <div className="no-data">{t('dash_no_data')}</div>}
         </div>
       </div>
 
       <div className="bottom-grid">
         <div className="card">
-          <div className="card-title">Isolationsort (Top 6)</div>
+          <div className="card-title">{t('dash_top_sites')}</div>
           {siteSorted.map(([label, val]) => (
             <HorizontalBar key={label} label={label} value={val}
               max={siteSorted[0]?.[1]||1} color="#5a9fd4" />
           ))}
         </div>
         <div className="card">
-          <div className="card-title">Clade-Verteilung</div>
+          <div className="card-title">{t('dash_clade_dist')}</div>
           {cladeSorted.map(([label, val]) => (
             <HorizontalBar key={label} label={label} value={val}
               max={cladeSorted[0]?.[1]||1} color="#2878b8" />
           ))}
         </div>
         <div className="card">
-          <div className="card-title">Bundesland-Ranking</div>
+          <div className="card-title">{t('dash_state_ranking')}</div>
           {stateSorted.map(([label, val]) => (
             <HorizontalBar key={label} label={label} value={val}
               max={stateSorted[0]?.[1]||1} color="#1a3a5c" />

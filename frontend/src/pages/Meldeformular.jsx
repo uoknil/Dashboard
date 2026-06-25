@@ -1,17 +1,19 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { submitCase } from '../services/api';
 import './Meldeformular.css';
 import Navbar from '../components/Navbar';
 import ReCAPTCHA from "react-google-recaptcha";
 
 // ─── Schritt-Anzeige ─────────────────────────────────────────
-const STEPS = ['Fall & Lokalisation','Klinische Angaben','Therapie & Kontakt','Bestätigung'];
+const STEP_KEYS = ['form_step1', 'form_step2', 'form_step3', 'form_step4'];
 
 function StepIndicator({ current }) {
+  const { t } = useTranslation();
   return (
     <div className="step-indicator" role="list">
-      {STEPS.map((label, i) => {
+      {STEP_KEYS.map((labelKey, i) => {
         const n = i + 1;
         const state = n < current ? 'done' : n === current ? 'active' : 'pending';
         return (
@@ -21,10 +23,10 @@ function StepIndicator({ current }) {
                 {state === 'done' ? '✓' : n}
               </div>
               <div className={`step-label${state === 'active' ? ' step-label-active' : ''}`}>
-                {label}
+                {t(labelKey)}
               </div>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < STEP_KEYS.length - 1 && (
               <div className={`step-line${n < current ? ' step-line-done' : ''}`} />
             )}
           </React.Fragment>
@@ -48,7 +50,7 @@ function Field({ id, label, required, hint, error, fullWidth = false, children }
   );
 }
 
-function SelectField({ id, value, onChange, options, placeholder = '– bitte wählen –', error }) {
+function SelectField({ id, value, onChange, options, placeholder, error }) {
   return (
     <select id={id} value={value} onChange={(e) => onChange(e.target.value)}
       className={error ? 'input-error' : ''}>
@@ -117,6 +119,7 @@ const INITIAL = {
 
 // ─── Hauptkomponente ──────────────────────────────────────────
 export default function Meldeformular() {
+  const { t, i18n } = useTranslation();
   const [form,         setForm]         = useState(INITIAL);
   const [errors,       setErrors]       = useState({});
   const [step,         setStep]         = useState(1);
@@ -134,26 +137,26 @@ export default function Meldeformular() {
   // ── Validierung ──────────────────────────────────────────────
   function validate1() {
     const e = {};
-    if (!form.state)                 e.state          = 'Bitte wählen Sie ein Bundesland.';
-    if (!form.city.trim())           e.city           = 'Stadt ist ein Pflichtfeld.';
-    if (!form.date_of_isolation)     e.date_of_isolation = 'Datum erforderlich.';
-    if (!form.isolation_site.trim()) e.isolation_site = 'Isolationsort erforderlich.';
-    if (!form.travel_history.trim()) e.travel_history = 'Reiseanamnese ist Pflicht (ggf. "Keine Auslandsreise").';
+    if (!form.state)                 e.state          = t('form_err_state');
+    if (!form.city.trim())           e.city           = t('form_err_city');
+    if (!form.date_of_isolation)     e.date_of_isolation = t('form_err_date');
+    if (!form.isolation_site.trim()) e.isolation_site = t('form_err_site');
+    if (!form.travel_history.trim()) e.travel_history = t('form_err_travel');
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
   function validate2() {
     const e = {};
-    if (!form.gender)                   e.gender         = 'Bitte wählen Sie ein Geschlecht.';
-    if (!form.medical_history.trim())   e.medical_history= 'Grunderkrankung erforderlich.';
+    if (!form.gender)                   e.gender         = t('form_err_gender');
+    if (!form.medical_history.trim())   e.medical_history= t('form_err_medical');
     if (form.age !== '') {
       const ageNum = Number(form.age);
       if (!Number.isInteger(ageNum) || ageNum < 1 || ageNum > 119)
-        e.age = 'Alter muss zwischen 1 und 119 liegen.';
+        e.age = t('form_err_age');
     }
     if (form.hospitalized_abroad && !form.hospital_name.trim())
-      e.hospital_name = 'Pflichtfeld wenn Auslandshospitalisierung aktiv.';
+      e.hospital_name = t('form_err_hospital');
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -161,11 +164,11 @@ export default function Meldeformular() {
   function validate3() {
     const e = {};
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.reporter_email))
-      e.reporter_email = 'Gültige E-Mail-Adresse erforderlich.';
+      e.reporter_email = t('form_err_email');
     if (form.antifungal_therapy && !form.antifungal_therapy_details.trim())
-      e.antifungal_therapy_details = 'Details zur antimykotischen Therapie erforderlich.';
+      e.antifungal_therapy_details = t('form_err_antifungal');
     if (form.topical_therapy && !form.topical_therapy_details.trim())
-      e.topical_therapy_details = 'Details zur topischen Therapie erforderlich.';
+      e.topical_therapy_details = t('form_err_topical');
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -211,7 +214,7 @@ export default function Meldeformular() {
   // ── Absenden ─────────────────────────────────────────────────
   async function handleSubmit() {
     if (!captchaToken) {
-      setErrors((e) => ({ ...e, captcha: 'Bitte bestätigen Sie, dass Sie kein Roboter sind.' }));
+      setErrors((e) => ({ ...e, captcha: t('form_err_captcha') }));
       return;
     }
     setSubmitState('loading');
@@ -223,7 +226,7 @@ export default function Meldeformular() {
     } catch (err) {
     // If it's an object, stringify it so it doesn't render as [object Object]
       const errorMsg = typeof err.message === 'object' ? JSON.stringify(err.message) : err.message;
-      setApiError(err.status === 422 ? `Validierungsfehler: ${errorMsg}` : `Fehler: ${errorMsg}`);
+      setApiError(err.status === 422 ? t('form_err_validation', { msg: errorMsg }) : t('form_err_generic', { msg: errorMsg }));
       setSubmitState('error');
     }
   }
@@ -236,21 +239,21 @@ export default function Meldeformular() {
 
   // ── Zusammenfassung ──────────────────────────────────────────
   const SUMMARY = [
-    ['Bundesland',           form.state],
-    ['Stadt',                form.city],
-    ['Datum der Isolierung', form.date_of_isolation],
-    ['Isolationsort',        form.isolation_site],
-    ['Infektionstyp',        form.infection_type],
-    ['Reiseanamnese',        form.travel_history],
-    ['Geschlecht',           form.gender],
-    ['Alter',                form.age || '—'],
-    ['Grunderkrankung',      form.medical_history],
-    ['Immunstatus',          form.immune_status],
-    ['Auslandshospitalisierung', form.hospitalized_abroad ? `Ja — ${form.hospital_name}` : 'Nein'],
-    ['Antimykotische Therapie',  form.antifungal_therapy ? `Ja — ${form.antifungal_therapy_details}` : 'Nein'],
-    ['Topische Therapie',        form.topical_therapy ? `Ja — ${form.topical_therapy_details}` : 'Nein'],
-    ['E-Mail',               form.reporter_email],
-    ['Zusatzinfos',          form.additional_info || '—'],
+    [t('form_sum_state'),    form.state],
+    [t('form_sum_city'),     form.city],
+    [t('form_sum_date'),     form.date_of_isolation],
+    [t('form_sum_site'),     form.isolation_site],
+    [t('form_sum_inftype'),  form.infection_type],
+    [t('form_sum_travel'),   form.travel_history],
+    [t('form_sum_gender'),   form.gender],
+    [t('form_sum_age'),      form.age || '—'],
+    [t('form_sum_medical'),  form.medical_history],
+    [t('form_sum_immune'),   form.immune_status],
+    [t('form_sum_hosp'),     form.hospitalized_abroad ? t('form_sum_yes_dash', { val: form.hospital_name }) : t('form_no')],
+    [t('form_sum_antifungal'), form.antifungal_therapy ? t('form_sum_yes_dash', { val: form.antifungal_therapy_details }) : t('form_no')],
+    [t('form_sum_topical'),  form.topical_therapy ? t('form_sum_yes_dash', { val: form.topical_therapy_details }) : t('form_no')],
+    [t('form_sum_email'),    form.reporter_email],
+    [t('form_sum_additional'), form.additional_info || '—'],
   ];
 
   // ── Erfolg ───────────────────────────────────────────────────
@@ -258,18 +261,16 @@ export default function Meldeformular() {
     return (
       <div className="form-page">
         <header className="topbar">
-          <div className="topbar-title">Candida auris Dashboard · Österreich</div>
+          <div className="topbar-title">{t('form_topbar_title')}</div>
         </header>
         <div className="success-panel">
           <div className="success-icon" aria-hidden="true" />
-          <h2 className="success-title">Meldung erfolgreich übermittelt</h2>
-          <p className="success-sub">
-            Ihre Meldung wurde per E-Mail weitergeleitet und wird nach fachlicher Prüfung übernommen.
-          </p>
-          {submissionId && <p className="success-id">Submission-ID: <strong>{submissionId}</strong></p>}
+          <h2 className="success-title">{t('form_success_title')}</h2>
+          <p className="success-sub">{t('form_success_sub')}</p>
+          {submissionId && <p className="success-id">{t('form_success_id')} <strong>{submissionId}</strong></p>}
           <div className="success-actions">
-            <button className="btn-primary" onClick={reset}>Neue Meldung erstellen</button>
-            <button className="btn-secondary" onClick={() => navigate('/')}>Zurück zum Dashboard</button>
+            <button className="btn-primary" onClick={reset}>{t('form_new_report')}</button>
+            <button className="btn-secondary" onClick={() => navigate('/')}>{t('form_back_dashboard')}</button>
           </div>
         </div>
       </div>
@@ -279,21 +280,11 @@ export default function Meldeformular() {
   // ── Formular ─────────────────────────────────────────────────
   return (
     <div className="form-page">
-{/*       <header className="topbar">
-        <div className="topbar-title">Candida auris Dashboard · Österreich</div>
-        <nav className="topbar-nav">
-          <button className="nav-btn">Dashboard</button>
-          <button className="nav-btn nav-btn-active">Fallmeldung</button>
-          <button className="nav-btn">Informationen</button>
-        </nav>
-      </header> */}
-
       <Navbar />
 
       <div className="info-banner" role="note">
         <div className="info-icon">i</div>
-        <div>Die Meldung wird <strong>nicht direkt gespeichert</strong> — sie wird per E-Mail
-        weitergeleitet. Pflichtfelder sind mit <span className="req">*</span> markiert.</div>
+        <div>{t('form_banner_pre')}<strong>{t('form_banner_strong')}</strong>{t('form_banner_post')}<span className="req">*</span>{t('form_banner_end')}</div>
       </div>
 
       <StepIndicator current={step} />
@@ -305,61 +296,62 @@ export default function Meldeformular() {
       {step === 1 && (
         <>
           <div className="panel">
-            <div className="panel-title">Angaben zum Fall <span className="panel-badge">Pflichtangaben</span></div>
+            <div className="panel-title">{t('form_p1_title')} <span className="panel-badge">{t('form_badge_required')}</span></div>
             <div className="field-grid">
-              <Field id="state" label="Bundesland" required error={errors.state}>
+              <Field id="state" label={t('form_state')} required error={errors.state}>
                 <SelectField id="state" value={form.state} onChange={(v) => set('state', v)}
                   error={!!errors.state}
+                  placeholder={t('form_select_ph')}
                   options={[
                     ['Vienna','Wien'],['Lower Austria','Niederösterreich'],
                     ['Upper Austria','Oberösterreich'],['Styria','Steiermark'],
                     ['Tyrol','Tirol'],['Salzburg','Salzburg'],['Carinthia','Kärnten'],
                     ['Vorarlberg','Vorarlberg'],['Burgenland','Burgenland'],
                   ]} />
-                <div className="field-hint">Wird als englischer Name ans Backend gesendet</div>
+                <div className="field-hint">{t('form_state_hint')}</div>
               </Field>
-              <Field id="city" label="Stadt / Ort" required error={errors.city}
-                hint="Pflichtfeld laut Backend-Schema">
+              <Field id="city" label={t('form_city')} required error={errors.city}
+                hint={t('form_city_hint')}>
                 <input id="city" type="text" value={form.city}
                   className={errors.city ? 'input-error' : ''}
                   onChange={(e) => set('city', e.target.value)}
-                  placeholder="z. B. Wien, Graz, Innsbruck" />
+                  placeholder={t('form_city_ph')} />
               </Field>
-              <Field id="date_of_isolation" label="Datum der Isolierung" required
-                error={errors.date_of_isolation} hint='Format: "YYYY-MM-DD"'>
+              <Field id="date_of_isolation" label={t('form_date')} required
+                error={errors.date_of_isolation} hint={t('form_date_hint')}>
                 <input id="date_of_isolation" type="date" value={form.date_of_isolation}
                   max={new Date().toISOString().split('T')[0]}
                   className={errors.date_of_isolation ? 'input-error' : ''}
                   onChange={(e) => set('date_of_isolation', e.target.value)} />
               </Field>
-              <Field id="isolation_site" label="Isolationsort" required
-                error={errors.isolation_site} hint="z. B. Blood culture, Urinary tract">
+              <Field id="isolation_site" label={t('form_site')} required
+                error={errors.isolation_site} hint={t('form_site_hint')}>
                 <input id="isolation_site" type="text" value={form.isolation_site}
                   className={errors.isolation_site ? 'input-error' : ''}
                   onChange={(e) => set('isolation_site', e.target.value)}
-                  placeholder="z. B. Blood culture …" />
+                  placeholder={t('form_site_ph')} />
               </Field>
-              <Field id="infection_type" label="Infektionstyp" required fullWidth
+              <Field id="infection_type" label={t('form_inftype')} required fullWidth
                 hint='"infection" | "colonization" | "unknown"'>
                 <RadioGroup name="infection_type" value={form.infection_type}
                   onChange={(v) => set('infection_type', v)}
-                  options={[['infection','Manifeste Infektion'],['colonization','Besiedelung'],['unknown','Unbekannt']]} />
+                  options={[['infection',t('form_inftype_infection')],['colonization',t('form_inftype_colonization')],['unknown',t('form_unknown')]]} />
               </Field>
             </div>
           </div>
           <div className="panel">
-            <div className="panel-title">Reiseanamnese <span className="panel-badge panel-badge-required">Pflicht</span></div>
-            <Field id="travel_history" label="Reiseanamnese" required error={errors.travel_history}
-              hint='Wenn keine Auslandsreise: bitte "Keine Auslandsreise" eintragen.'>
+            <div className="panel-title">{t('form_travel_panel')} <span className="panel-badge panel-badge-required">{t('form_badge_req_short')}</span></div>
+            <Field id="travel_history" label={t('form_travel')} required error={errors.travel_history}
+              hint={t('form_travel_hint')}>
               <textarea id="travel_history" rows={3} value={form.travel_history}
                 className={errors.travel_history ? 'input-error' : ''}
                 onChange={(e) => set('travel_history', e.target.value)}
-                placeholder="z. B. Hospitalisierung in Athen, Griechenland · Keine Auslandsreise" />
+                placeholder={t('form_travel_ph')} />
             </Field>
           </div>
           <div className="btn-row">
-            <span className="step-hint">Schritt 1 von 4</span>
-            <button className="btn-primary" onClick={nextStep}>Weiter →</button>
+            <span className="step-hint">{t('form_step_of', { current: 1 })}</span>
+            <button className="btn-primary" onClick={nextStep}>{t('form_next')}</button>
           </div>
         </>
       )}
@@ -368,49 +360,50 @@ export default function Meldeformular() {
       {step === 2 && (
         <>
           <div className="panel">
-            <div className="panel-title">Patientendaten <span className="panel-badge">Anonym</span></div>
+            <div className="panel-title">{t('form_p2_title')} <span className="panel-badge">{t('form_badge_anon')}</span></div>
             <div className="field-grid">
-              <Field id="gender" label="Geschlecht" required error={errors.gender}
+              <Field id="gender" label={t('form_gender')} required error={errors.gender}
                 hint='"male" | "female" | "divers" | "inter" | "other"'>
                 <SelectField id="gender" value={form.gender} onChange={(v) => set('gender', v)}
                   error={!!errors.gender}
-                  options={[['male','männlich'],['female','weiblich'],['other','divers'],['intersex','intersex / inter'],['unknown','unbekannt']]} />
+                  placeholder={t('form_select_ph')}
+                  options={[['male',t('form_gender_male')],['female',t('form_gender_female')],['other',t('form_gender_divers')],['intersex',t('form_gender_inter')],['unknown',t('form_unknown')]]} />
               </Field>
-              <Field id="age" label="Alter" hint="Optional, 1–119" error={errors.age}>
+              <Field id="age" label={t('form_age')} hint={t('form_age_hint')} error={errors.age}>
                 <input id="age" type="number" value={form.age} min="1" max="119"
                   className={errors.age ? 'input-error' : ''}
-                  onChange={(e) => set('age', e.target.value)} placeholder="z. B. 72" />
+                  onChange={(e) => set('age', e.target.value)} placeholder={t('form_age_ph')} />
               </Field>
-              <Field id="immune_status" label="Immunstatus" fullWidth
+              <Field id="immune_status" label={t('form_immune')} fullWidth
                 hint='"immunocompetent" | "immunocompromised" | "unknown"'>
                 <RadioGroup name="immune_status" value={form.immune_status}
                   onChange={(v) => set('immune_status', v)}
-                  options={[['immunocompetent','Immunkompetent'],['immunocompromised','Immunkompromittiert'],['unknown','Unbekannt']]} />
+                  options={[['immunocompetent',t('form_immune_competent')],['immunocompromised',t('form_immune_compromised')],['unknown',t('form_unknown')]]} />
               </Field>
-              <Field id="medical_history" label="Grunderkrankung / Aufnahmegrund" required
+              <Field id="medical_history" label={t('form_medical')} required
                 error={errors.medical_history} fullWidth>
                 <textarea id="medical_history" rows={2} value={form.medical_history}
                   className={errors.medical_history ? 'input-error' : ''}
                   onChange={(e) => set('medical_history', e.target.value)}
-                  placeholder="z. B. Diabetes mellitus Typ 2 …" />
+                  placeholder={t('form_medical_ph')} />
               </Field>
             </div>
           </div>
           <div className="panel">
-            <div className="panel-title">Auslandshospitalisierung</div>
-            <ToggleSection label="Im Ausland hospitalisiert? (hospitalized_abroad)"
+            <div className="panel-title">{t('form_abroad_panel')}</div>
+            <ToggleSection label={t('form_abroad_toggle')}
               fieldName="hospitalized_abroad" checked={form.hospitalized_abroad} onChange={set}>
-              <Field id="hospital_name" label="Krankenhaus / Land / Stadt" required
-                error={errors.hospital_name} hint="Land und Stadt bevorzugt">
+              <Field id="hospital_name" label={t('form_hospital')} required
+                error={errors.hospital_name} hint={t('form_hospital_hint')}>
                 <input id="hospital_name" type="text" value={form.hospital_name}
                   className={errors.hospital_name ? 'input-error' : ''}
                   onChange={(e) => set('hospital_name', e.target.value)}
-                  placeholder="z. B. Hospitalisierung in Athen, Griechenland" />
+                  placeholder={t('form_hospital_ph')} />
               </Field>
             </ToggleSection>
           </div>
           <div className="panel">
-            <div className="panel-title">MIC-Werte <span className="panel-badge">Optional</span></div>
+            <div className="panel-title">{t('form_mic_panel')} <span className="panel-badge">{t('form_badge_optional')}</span></div>
             <div className="mic-grid">
               {[['mic_and','Anidulafungin'],['mic_mic','Micafungin'],['mic_cas','Caspofungin'],
                 ['mic_flc','Fluconazol'],['mic_pos','Posaconazol'],['mic_vor','Voriconazol'],
@@ -421,8 +414,8 @@ export default function Meldeformular() {
             </div>
           </div>
           <div className="btn-row">
-            <button className="btn-secondary" onClick={() => setStep(1)}>← Zurück</button>
-            <button className="btn-primary" onClick={nextStep}>Weiter →</button>
+            <button className="btn-secondary" onClick={() => setStep(1)}>{t('form_back')}</button>
+            <button className="btn-primary" onClick={nextStep}>{t('form_next')}</button>
           </div>
         </>
       )}
@@ -431,53 +424,53 @@ export default function Meldeformular() {
       {step === 3 && (
         <>
           <div className="panel">
-            <div className="panel-title">Antimykotische Therapie</div>
-            <ToggleSection label="Aktuelle antimykotische Therapie? (antifungal_therapy)"
+            <div className="panel-title">{t('form_antifungal_panel')}</div>
+            <ToggleSection label={t('form_antifungal_toggle')}
               fieldName="antifungal_therapy" checked={form.antifungal_therapy} onChange={set}>
-              <Field id="antifungal_therapy_details" label="Welche Therapie?" required
+              <Field id="antifungal_therapy_details" label={t('form_which_therapy')} required
                 error={errors.antifungal_therapy_details}>
                 <input id="antifungal_therapy_details" type="text"
                   value={form.antifungal_therapy_details}
                   className={errors.antifungal_therapy_details ? 'input-error' : ''}
                   onChange={(e) => set('antifungal_therapy_details', e.target.value)}
-                  placeholder="z. B. Caspofungin 70 mg/d …" />
+                  placeholder={t('form_antifungal_ph')} />
               </Field>
             </ToggleSection>
           </div>
           <div className="panel">
-            <div className="panel-title">Topische Therapie</div>
-            <ToggleSection label="Lokale/topische Therapie? (topical_therapy)"
+            <div className="panel-title">{t('form_topical_panel')}</div>
+            <ToggleSection label={t('form_topical_toggle')}
               fieldName="topical_therapy" checked={form.topical_therapy} onChange={set}>
-              <Field id="topical_therapy_details" label="Welche Therapie?" required
+              <Field id="topical_therapy_details" label={t('form_which_therapy')} required
                 error={errors.topical_therapy_details}>
                 <input id="topical_therapy_details" type="text"
                   value={form.topical_therapy_details}
                   className={errors.topical_therapy_details ? 'input-error' : ''}
                   onChange={(e) => set('topical_therapy_details', e.target.value)}
-                  placeholder="z. B. Chlorhexidin-Waschungen …" />
+                  placeholder={t('form_topical_ph')} />
               </Field>
             </ToggleSection>
           </div>
           <div className="panel">
-            <div className="panel-title">Kontakt</div>
+            <div className="panel-title">{t('form_contact_panel')}</div>
             <div className="field-grid">
-              <Field id="reporter_email" label="E-Mail (reporter_email)" required
-                error={errors.reporter_email} hint="Nur für Rückfragen" fullWidth>
+              <Field id="reporter_email" label={t('form_email')} required
+                error={errors.reporter_email} hint={t('form_email_hint')} fullWidth>
                 <input id="reporter_email" type="email" value={form.reporter_email}
                   className={errors.reporter_email ? 'input-error' : ''}
                   onChange={(e) => set('reporter_email', e.target.value)}
                   placeholder="name@krankenhaus.at" />
               </Field>
-              <Field id="additional_info" label="Zusatzinfos" hint="Keine Personendaten" fullWidth>
+              <Field id="additional_info" label={t('form_additional')} hint={t('form_additional_hint')} fullWidth>
                 <textarea id="additional_info" rows={3} value={form.additional_info}
                   onChange={(e) => set('additional_info', e.target.value)}
-                  placeholder="Sonstige Angaben …" />
+                  placeholder={t('form_additional_ph')} />
               </Field>
             </div>
           </div>
           <div className="btn-row">
-            <button className="btn-secondary" onClick={() => setStep(2)}>← Zurück</button>
-            <button className="btn-primary" onClick={nextStep}>Weiter →</button>
+            <button className="btn-secondary" onClick={() => setStep(2)}>{t('form_back')}</button>
+            <button className="btn-primary" onClick={nextStep}>{t('form_next')}</button>
           </div>
         </>
       )}
@@ -486,7 +479,7 @@ export default function Meldeformular() {
       {step === 4 && (
         <>
           <div className="panel">
-            <div className="panel-title">Zusammenfassung</div>
+            <div className="panel-title">{t('form_summary_title')}</div>
             <div className="summary-table">
               {SUMMARY.map(([key, val]) => (
                 <div key={key} className="summary-row">
@@ -497,11 +490,13 @@ export default function Meldeformular() {
             </div>
           </div>
 <div className="panel">
-            <div className="panel-title">Sicherheitsüberprüfung</div>
-            
+            <div className="panel-title">{t('form_captcha_panel')}</div>
+
             {/* Real Official Google reCAPTCHA widget alignment container */}
             <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
               <ReCAPTCHA
+                key={i18n.language}
+                hl={i18n.language}
                 sitekey="6LcKBS0tAAAAAHx2okwkn1eIg0D2Vtwilkhc0Z3o"
                 onChange={(token) => {
                   setCaptchaToken(token || "");
@@ -509,21 +504,21 @@ export default function Meldeformular() {
                 }}
               />
             </div>
-            
+
             {errors.captcha && <div className="field-err-msg" style={{textAlign: 'center', marginTop:'6px'}}>{errors.captcha}</div>}
           </div>
           {submitState === 'error' && (
             <div className="api-err-banner" role="alert">
-              <strong>Fehler:</strong> {apiError}
+              <strong>{t('form_error_label')}</strong> {apiError}
             </div>
           )}
           <div className="btn-row">
-            <button className="btn-secondary" onClick={() => setStep(3)}>← Zurück</button>
+            <button className="btn-secondary" onClick={() => setStep(3)}>{t('form_back')}</button>
             <button className="btn-primary" onClick={handleSubmit}
               disabled={submitState === 'loading'}>
               {submitState === 'loading'
-                ? <><span className="spinner" /> Wird gesendet…</>
-                : 'Meldung absenden'}
+                ? <><span className="spinner" /> {t('form_submitting')}</>
+                : t('form_submit')}
             </button>
           </div>
         </>

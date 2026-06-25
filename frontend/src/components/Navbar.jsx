@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, username, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,30 +47,30 @@ export default function Navbar() {
         <NavLink to="/" end
           className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
           onClick={() => setMenuOpen(false)}>
-          Dashboard
+          {t('nav_dashboard')}
         </NavLink>
         <NavLink to="/meldung"
           className={({ isActive }) =>
             `navbar-link${isActive ? ' active' : ''}${isAdminArea ? '' : ' navbar-cta'}`}
           onClick={() => setMenuOpen(false)}>
-          Fallmeldung
+          {t('nav_report')}
         </NavLink>
         <NavLink to="/info"
           className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
           onClick={() => setMenuOpen(false)}>
-          Informationen
+          {t('nav_info')}
         </NavLink>
         <NavLink to="/about"
           className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
           onClick={() => setMenuOpen(false)}>
-          Über uns
+          {t('nav_about')}
         </NavLink>
 
         {isAuthenticated && (
           <NavLink to="/admin"
             className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
             onClick={() => setMenuOpen(false)}>
-            Admin
+            {t('nav_admin')}
           </NavLink>
         )}
 
@@ -76,10 +78,18 @@ export default function Navbar() {
           <div className="navbar-right">
             <span className="navbar-user">{username}</span>
             <button className="navbar-logout" onClick={handleLogout}>
-              Abmelden
+              {t('nav_logout')}
             </button>
           </div>
         )}
+
+        <button
+          className="navbar-lang"
+          onClick={() => i18n.changeLanguage(i18n.language === 'de' ? 'en' : 'de')}
+          aria-label="Sprache wechseln"
+        >
+          {i18n.language === 'de' ? 'EN' : 'DE'}
+        </button>
       </div>
     </nav>
   );

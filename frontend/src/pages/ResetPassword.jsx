@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { resetPassword } from '../services/api';
 import './ResetPassword.css';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [token,    setToken]    = useState('');
   const [pass1,    setPass1]    = useState('');
@@ -16,22 +18,22 @@ export default function ResetPassword() {
   // Token aus der URL lesen: /reset-password?token=XYZ
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const t = params.get('token');
-    if (t) setToken(t);
+    const tok = params.get('token');
+    if (tok) setToken(tok);
   }, []);
 
   async function handleSubmit() {
     setError('');
     if (!token) {
-      setError('Kein gültiges Token gefunden. Bitte verwenden Sie den Link aus der E-Mail.');
+      setError(t('reset_err_no_token'));
       return;
     }
     if (pass1.length < 6) {
-      setError('Das Passwort muss mindestens 6 Zeichen lang sein.');
+      setError(t('reset_err_too_short'));
       return;
     }
     if (pass1 !== pass2) {
-      setError('Die beiden Passwörter stimmen nicht überein.');
+      setError(t('reset_err_mismatch'));
       return;
     }
 
@@ -42,8 +44,8 @@ export default function ResetPassword() {
     } catch (err) {
       setError(
         err.status === 400
-          ? 'Der Wiederherstellungslink ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen an.'
-          : `Fehler: ${err.message}`
+          ? t('reset_err_invalid_link')
+          : t('reset_err_generic', { msg: err.message })
       );
     } finally {
       setLoading(false);
@@ -56,13 +58,10 @@ export default function ResetPassword() {
       <div className="reset-page">
         <div className="reset-card">
           <div className="reset-success-icon" aria-hidden="true" />
-          <h1 className="reset-title">Passwort geändert</h1>
-          <p className="reset-sub">
-            Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich nun
-            mit Ihrem neuen Passwort anmelden.
-          </p>
+          <h1 className="reset-title">{t('reset_success_title')}</h1>
+          <p className="reset-sub">{t('reset_success_sub')}</p>
           <button className="login-btn" onClick={() => navigate('/login', { replace: true })}>
-            Zur Anmeldung
+            {t('reset_to_login')}
           </button>
         </div>
       </div>
@@ -73,38 +72,35 @@ export default function ResetPassword() {
   return (
     <div className="reset-page">
       <div className="reset-card">
-        <h1 className="reset-title">Neues Passwort festlegen</h1>
-        <p className="reset-sub">Bitte wählen Sie ein neues Passwort für Ihr Konto.</p>
+        <h1 className="reset-title">{t('reset_title')}</h1>
+        <p className="reset-sub">{t('reset_sub')}</p>
 
         {!token && (
-          <div className="login-api-err" role="alert">
-            Kein Token in der Adresse gefunden. Bitte öffnen Sie diese Seite
-            über den Link aus der E-Mail.
-          </div>
+          <div className="login-api-err" role="alert">{t('reset_no_token_banner')}</div>
         )}
 
         {error && <div className="login-api-err" role="alert">{error}</div>}
 
         <div className="login-field">
-          <label htmlFor="reset-pass1">Neues Passwort</label>
+          <label htmlFor="reset-pass1">{t('reset_pass1_label')}</label>
           <input
             id="reset-pass1"
             type="password"
             value={pass1}
             onChange={(e) => { setPass1(e.target.value); setError(''); }}
-            placeholder="mindestens 6 Zeichen"
+            placeholder={t('reset_pass1_ph')}
             autoComplete="new-password"
           />
         </div>
 
         <div className="login-field">
-          <label htmlFor="reset-pass2">Passwort bestätigen</label>
+          <label htmlFor="reset-pass2">{t('reset_pass2_label')}</label>
           <input
             id="reset-pass2"
             type="password"
             value={pass2}
             onChange={(e) => { setPass2(e.target.value); setError(''); }}
-            placeholder="Passwort wiederholen"
+            placeholder={t('reset_pass2_ph')}
             autoComplete="new-password"
           />
         </div>
@@ -115,8 +111,8 @@ export default function ResetPassword() {
           disabled={loading || !token}
         >
           {loading
-            ? <><span className="spinner" aria-hidden="true" /> Wird gespeichert…</>
-            : 'Passwort speichern'}
+            ? <><span className="spinner" aria-hidden="true" /> {t('reset_submitting')}</>
+            : t('reset_submit')}
         </button>
       </div>
     </div>

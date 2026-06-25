@@ -4,8 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { loginUser, forgotPassword } from '../services/api';
 import './Login.css';
 import Navbar from '../components/Navbar';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors,   setErrors]   = useState({});
@@ -34,8 +36,8 @@ export default function Login() {
   // ── Validierung ──────────────────────────────────────────────
   function validate() {
     const e = {};
-    if (!username.trim()) e.username = 'Benutzername erforderlich.';
-    if (!password)        e.password = 'Passwort erforderlich.';
+    if (!username.trim()) e.username = t('login_err_username');
+    if (!password)        e.password = t('login_err_password');
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -55,12 +57,9 @@ export default function Login() {
       navigate('/admin', { replace: true });
     } catch (err) {
       if (err.status === 401) {
-        setApiError('Ungültige Anmeldedaten oder Account deaktiviert.');
+        setApiError(t('login_err_invalid'));
       } else {
-        setApiError(
-          `Verbindungsfehler: ${err.message}. ` +
-          `Läuft der Backend-Server? (${import.meta.env.VITE_API_URL || 'http://localhost:8000'})`
-        );
+        setApiError(t('login_conn_err', { msg: err.message }));
       }
     } finally {
       setLoading(false);
@@ -72,7 +71,7 @@ export default function Login() {
     setForgotError('');
     setForgotMsg('');
     if (!forgotName.trim()) {
-      setForgotError('Bitte geben Sie Ihren Benutzernamen ein.');
+      setForgotError(t('login_forgot_err_empty'));
       return;
     }
     setForgotBusy(true);
@@ -80,13 +79,9 @@ export default function Login() {
       await forgotPassword(forgotName.trim());
       // Backend antwortet aus Sicherheitsgründen immer mit Erfolg —
       // egal ob der Benutzername existiert. Daher zeigen wir immer dieselbe Meldung.
-      setForgotMsg(
-        'Falls dieses Konto existiert, wurde ein Wiederherstellungslink an die ' +
-        'System-/Supervisor-E-Mail gesendet. Bitte kontaktieren Sie Kathrin Spettel, ' +
-        'um Ihren Link zu erhalten.'
-      );
+      setForgotMsg(t('login_forgot_msg'));
     } catch (err) {
-      setForgotError(`Verbindungsfehler: ${err.message}. Läuft der Backend-Server?`);
+      setForgotError(t('login_conn_err', { msg: err.message }));
     } finally {
       setForgotBusy(false);
     }
@@ -109,13 +104,13 @@ export default function Login() {
           </svg>
         </div>
         <div className="login-logo-title">Candida auris Dashboard</div>
-        <div className="login-logo-sub">Österreich · Geschützter Bereich</div>
+        <div className="login-logo-sub">{t('login_logo_sub')}</div>
       </div>
 
       {/* Karte */}
       <div className="login-card" role="main">
-        <h1 className="login-title">Anmeldung</h1>
-        <p  className="login-sub">Nur für autorisierte Personen zugänglich</p>
+        <h1 className="login-title">{t('login_title')}</h1>
+        <p  className="login-sub">{t('login_sub')}</p>
 
         {/* API-Fehler */}
         {apiError && (
@@ -126,7 +121,7 @@ export default function Login() {
 
           {/* Benutzername */}
           <div className={`login-field${errors.username ? ' login-field-err' : ''}`}>
-            <label htmlFor="login-username">Benutzername</label>
+            <label htmlFor="login-username">{t('login_username')}</label>
             <input
               ref={userRef}
               id="login-username"
@@ -146,7 +141,7 @@ export default function Login() {
 
           {/* Passwort */}
           <div className={`login-field${errors.password ? ' login-field-err' : ''}`}>
-            <label htmlFor="login-password">Passwort</label>
+            <label htmlFor="login-password">{t('login_password')}</label>
             <input
               id="login-password"
               type="password"
@@ -169,8 +164,8 @@ export default function Login() {
             disabled={loading}
           >
             {loading
-              ? <><span className="spinner" aria-hidden="true" /> Anmelden…</>
-              : 'Anmelden'}
+              ? <><span className="spinner" aria-hidden="true" /> {t('login_submitting')}</>
+              : t('login_submit')}
           </button>
         </form>
 
@@ -181,7 +176,7 @@ export default function Login() {
             className="login-forgot-link"
             onClick={() => { setForgotMode(true); setApiError(''); }}
           >
-            Passwort vergessen?
+            {t('login_forgot_link')}
           </button>
         ) : (
           <div className="login-forgot-box">
@@ -190,13 +185,13 @@ export default function Login() {
             ) : (
               <>
                 <div className="login-field">
-                  <label htmlFor="forgot-username">Benutzername</label>
+                  <label htmlFor="forgot-username">{t('login_username')}</label>
                   <input
                     id="forgot-username"
                     type="text"
                     value={forgotName}
                     onChange={(e) => { setForgotName(e.target.value); setForgotError(''); }}
-                    placeholder="Ihr Benutzername"
+                    placeholder={t('login_forgot_username_ph')}
                     autoComplete="username"
                   />
                 </div>
@@ -210,8 +205,8 @@ export default function Login() {
                   disabled={forgotBusy}
                 >
                   {forgotBusy
-                    ? <><span className="spinner" aria-hidden="true" /> Wird gesendet…</>
-                    : 'Wiederherstellungslink anfordern'}
+                    ? <><span className="spinner" aria-hidden="true" /> {t('login_forgot_submitting')}</>
+                    : t('login_forgot_submit')}
                 </button>
               </>
             )}
@@ -219,8 +214,7 @@ export default function Login() {
         )}
 
         <div className="login-notice">
-          <strong>Token-Gültigkeit:</strong> 180 Minuten. Kein automatischer Refresh.<br />
-          Bei Ablauf werden Sie automatisch abgemeldet.<br /><br />
+          <strong>{t('login_notice_label')}</strong> {t('login_notice_text')}<br /><br />
         </div>
       </div>
     </div>

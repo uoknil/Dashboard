@@ -493,7 +493,7 @@ export default function Meldeformular() {
               <ReCAPTCHA
                 key={i18n.language}
                 hl={i18n.language}
-                sitekey="6LcKBS0tAAAAAHx2okwkn1eIg0D2Vtwilkhc0Z3o"
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                 onChange={(token) => {
                   setCaptchaToken(token || "");
                   setErrors((e) => ({ ...e, captcha: '' }));

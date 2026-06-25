@@ -87,10 +87,15 @@ export default function AustriaMapGeo({ stateData = {} }) {
                   fill={getColor(value, max)}
                   stroke="#1a3a5c"
                   strokeWidth={0.6}
+                  // style={{
+                  //   default: { outline: 'none' },
+                  //   hover:   { outline: 'none', fill: '#e6a817' },
+                  //   pressed: { outline: 'none' },
+                  // }}
                   style={{
                     default: { outline: 'none' },
-                    hover:   { outline: 'none', fill: '#e6a817' },
-                    pressed: { outline: 'none' },
+                    hover:   { outline: 'none', fill: '#e6a817', cursor: 'pointer' },
+                    pressed: { outline: 'none', fill: '#e6a817' },
                   }}
                   onMouseEnter={(e) => {
                     const r = wrapperRef.current?.getBoundingClientRect();

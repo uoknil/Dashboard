@@ -94,8 +94,8 @@ export default function WorldMap({ countryData = {} }) {
                   strokeWidth={0.4}
                   style={{
                     default: { outline: 'none' },
-                    hover:   { outline: 'none', fill: value > 0 ? '#e6a817' : '#dfe6ee' },
-                    pressed: { outline: 'none' },
+                    hover:   { outline: 'none', fill: value > 0 ? '#e6a817' : '#dfe6ee', cursor: 'pointer' },
+                    pressed: { outline: 'none', fill: value > 0 ? '#e6a817' : '#dfe6ee' },
                   }}
                   onMouseEnter={(e) => {
                     const label = displayName(name, i18n.language);

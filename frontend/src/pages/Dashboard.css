@@ -317,3 +317,15 @@
     margin-top: 14px;
   }
 }
+
+/* Kein blauer Fokus-Rahmen auf Karten-Pfaden — stattdessen orange aufleuchten */
+.map-wrapper svg path:focus,
+.worldmap-wrapper svg path:focus {
+  outline: none;
+  fill: #e6a817;
+}
+.map-wrapper svg path:focus-visible,
+.worldmap-wrapper svg path:focus-visible {
+  outline: none;
+  fill: #e6a817;
+}

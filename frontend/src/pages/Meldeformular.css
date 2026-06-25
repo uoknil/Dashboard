@@ -158,7 +158,7 @@
 .req {
   color: #c0392b;
 }
-.field input,
+/* .field input,
 .field select,
 .field textarea {
   width: 100%;
@@ -176,6 +176,30 @@
 .field textarea:focus {
   outline: none;
   border-color: #2878b8;
+  box-shadow: 0 0 0 2px rgba(40, 120, 184, 0.12);
+} */
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d8dce1;
+  background: #f8f9fa;
+  color: #111827;
+  font-family: inherit;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #2878b8;
+  background: #fff;
   box-shadow: 0 0 0 2px rgba(40, 120, 184, 0.12);
 }
 .input-error {

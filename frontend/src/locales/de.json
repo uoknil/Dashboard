@@ -5,6 +5,8 @@
   "nav_about": "Über uns",
   "nav_admin": "Admin",
   "nav_logout": "Abmelden",
+  "nav_menu_open": "Menü öffnen",
+  "nav_menu_close": "Menü schließen",
 
   "login_logo_sub": "Österreich · Geschützter Bereich",
   "login_title": "Anmeldung",
@@ -49,6 +51,8 @@
   "about_imp_liability_text": "Die Inhalte dieses Dashboards dienen ausschließlich wissenschaftlichen und epidemiologischen Zwecken. Es werden keine Therapieempfehlungen oder klinischen Leitlinien bereitgestellt. Für externe verlinkte Inhalte übernehmen wir keine Haftung.",
   "about_privacy_notice_title": "Hinweis",
   "about_privacy_notice_text": "Die endgültige Datenschutzerklärung wird vor dem öffentlichen Go-Live durch die verantwortliche Organisation bereitgestellt und hier eingefügt.",
+  "about_imp_attribution": "Datenquellen",
+  "about_imp_attribution_text": "Kartengrundlage Bundesländer: ginseng666/GeoJSON-TopoJSON-Austria, basierend auf Statistik Austria, CC BY 4.0.",
   
   "dash_title": "Candida auris Surveillance Dashboard · Österreich",
   "dash_sub": "Aggregierte, anonymisierte Falldaten auf Bundeslandebene",

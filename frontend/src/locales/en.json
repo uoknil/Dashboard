@@ -5,6 +5,8 @@
   "nav_about": "About us",
   "nav_admin": "Admin",
   "nav_logout": "Log out",
+  "nav_menu_open": "Open menu",
+  "nav_menu_close": "Close menu",
 
   "login_logo_sub": "Austria · Restricted area",
   "login_title": "Sign in",
@@ -49,6 +51,8 @@
   "about_imp_liability_text": "The content of this dashboard serves exclusively scientific and epidemiological purposes. No treatment recommendations or clinical guidelines are provided. We assume no liability for externally linked content.",
   "about_privacy_notice_title": "Note",
   "about_privacy_notice_text": "The final privacy policy will be provided by the responsible organization before the public go-live and inserted here.",
+  "about_imp_attribution": "Data sources",
+  "about_imp_attribution_text": "State boundary map data: ginseng666/GeoJSON-TopoJSON-Austria, based on Statistik Austria, CC BY 4.0.",
 
   "dash_title": "Candida auris Surveillance Dashboard · Austria",
   "dash_sub": "Aggregated, anonymized case data at the state level",
@@ -234,7 +238,6 @@
   "form_city_hint": "Mandatory field per backend schema",
   "form_city_ph": "e.g. Vienna, Graz, Innsbruck",
   "form_date": "Date of isolation",
-  "form_date_hint": "Format: \"YYYY-MM-DD\"",
   "form_site": "Isolation site",
   "form_site_ph": "e.g. blood culture, urinary tract",
   "form_inftype": "Infection type",
@@ -251,7 +254,6 @@
   "form_gender_divers": "diverse",
   "form_gender_inter": "intersex / inter",
   "form_age": "Age",
-  "form_age_hint": "Optional, 1–119",
   "form_age_ph": "e.g. 72",
   "form_immune": "Immune status",
   "form_immune_competent": "Immunocompetent",

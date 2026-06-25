@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -15,9 +15,19 @@ export default function Navbar() {
   const isAdminArea = location.pathname.startsWith('/admin')
     || location.pathname.startsWith('/login');
 
+  // Body-Scroll sperren, solange das mobile Menü offen ist
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   function handleLogout() {
     logout();
     navigate('/login', { replace: true });
+  }
+
+  function closeMenu() {
+    setMenuOpen(false);
   }
 
   return (
@@ -34,42 +44,62 @@ export default function Navbar() {
         <span className="navbar-title">C. auris Dashboard</span>
       </div>
 
+      {/* Hamburger (nur mobil sichtbar) — öffnet das Panel */}
       <button
-        className={`navbar-hamburger${menuOpen ? ' open' : ''}`}
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Menü öffnen"
+        className="navbar-hamburger"
+        onClick={() => setMenuOpen(true)}
+        aria-label={t('nav_menu_open')}
         aria-expanded={menuOpen}
       >
         <span /><span /><span />
       </button>
 
+      {/* Abgedunkelter Hintergrund (nur mobil, wenn offen) */}
+      <div
+        className={`navbar-overlay${menuOpen ? ' open' : ''}`}
+        onClick={closeMenu}
+        aria-hidden="true"
+      />
+
+      {/* Navigationslinks: Desktop = Reihe, Mobil = Panel von rechts */}
       <div className={`navbar-links${menuOpen ? ' open' : ''}`}>
+        {/* Panel-Kopf mit X — nur mobil sichtbar */}
+        <div className="navbar-panel-header">
+          <button
+            className="navbar-close"
+            onClick={closeMenu}
+            aria-label={t('nav_menu_close')}
+          >
+            ×
+          </button>
+        </div>
+
         <NavLink to="/" end
           className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
-          onClick={() => setMenuOpen(false)}>
+          onClick={closeMenu}>
           {t('nav_dashboard')}
         </NavLink>
         <NavLink to="/meldung"
           className={({ isActive }) =>
             `navbar-link${isActive ? ' active' : ''}${isAdminArea ? '' : ' navbar-cta'}`}
-          onClick={() => setMenuOpen(false)}>
+          onClick={closeMenu}>
           {t('nav_report')}
         </NavLink>
         <NavLink to="/info"
           className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
-          onClick={() => setMenuOpen(false)}>
+          onClick={closeMenu}>
           {t('nav_info')}
         </NavLink>
         <NavLink to="/about"
           className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
-          onClick={() => setMenuOpen(false)}>
+          onClick={closeMenu}>
           {t('nav_about')}
         </NavLink>
 
         {isAuthenticated && (
           <NavLink to="/admin"
             className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
-            onClick={() => setMenuOpen(false)}>
+            onClick={closeMenu}>
             {t('nav_admin')}
           </NavLink>
         )}

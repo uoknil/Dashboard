@@ -198,14 +198,6 @@
 .acc-header.open .acc-arrow {
   transform: rotate(180deg);
 }
-/*
-.acc-body {
-  font-size: 13px;
-  color: #374151;
-  line-height: 1.75;
-  padding: 0 4px 14px;
-}
-*/
 
 .acc-body {
   font-size: 13px;
@@ -349,19 +341,6 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
-/*
-.glossar-item {
-  background: #f8f6f1;
-  border-radius: 7px;
-  padding: 12px 14px;
-}
-.glossar-term {
-  font-size: 13px;
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 4px;
-}
-*/
 
 .glossar-item {
   background: #f8f6f1;

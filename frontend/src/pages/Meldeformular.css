@@ -296,61 +296,7 @@
 .summary-val {
   color: #111827;
 }
-.captcha-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: #f9fafb;
-  border: 0.5px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 14px 16px;
-}
-.captcha-box.captcha-error {
-  border-color: #c0392b;
-}
-.captcha-check {
-  width: 22px;
-  height: 22px;
-  border: 1.5px solid #d1d5db;
-  border-radius: 4px;
-  cursor: pointer;
-  background: #fff;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-.captcha-checked {
-  background: #1a3a5c;
-  border-color: #1a3a5c;
-}
-.captcha-checked::after {
-  content: '';
-  display: block;
-  width: 5px;
-  height: 9px;
-  border-right: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: rotate(45deg) translate(-1px, -1px);
-  margin: auto;
-}
-.captcha-label {
-  font-size: 13px;
-  color: #374151;
-  font-weight: 500;
-}
-.captcha-sub {
-  font-size: 11px;
-  color: #9ca3af;
-}
-.captcha-brand {
-  margin-left: auto;
-  font-size: 10px;
-  color: #9ca3af;
-  text-align: center;
-  line-height: 1.4;
-}
-.captcha-brand span {
-  font-size: 9px;
-}
+
 .api-err-banner {
   background: #fdf0ef;
   border: 0.5px solid #f5c6c2;

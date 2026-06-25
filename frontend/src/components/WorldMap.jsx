@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ComposableMap,
   Geographies,
@@ -23,8 +24,9 @@ function normalizeCountry(input) {
   return COUNTRY_DE_EN[input.trim().toLowerCase()] || null;
 }
 
-function displayName(enName) {
-  return COUNTRY_EN_DE[enName] || enName;
+function displayName(enName, lang) {
+  if (lang === 'de') return COUNTRY_EN_DE[enName] || enName;
+  return enName; 
 }
 
 function buildEnglishCounts(countryData) {
@@ -46,6 +48,7 @@ function getColor(value, max) {
 }
 
 export default function WorldMap({ countryData = {} }) {
+  const { t, i18n } = useTranslation();
   const [geoData, setGeoData] = useState(null);
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
 
@@ -95,11 +98,11 @@ export default function WorldMap({ countryData = {} }) {
                     pressed: { outline: 'none' },
                   }}
                   onMouseEnter={(e) => {
-                    const label = displayName(name);
+                    const label = displayName(name, i18n.language);
                     setTooltip({
                       visible: true,
                       text: value > 0
-                        ? `${label}: ${value} ${value === 1 ? 'Fall' : 'Fälle'}`
+                        ? `${label}: ${value} ${value === 1 ? t('dash_case_singular') : t('dash_case_plural')}`
                         : label,
                       x: e.clientX,
                       y: e.clientY,

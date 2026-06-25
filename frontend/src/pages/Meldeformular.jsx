@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { submitCase } from '../services/api';
 import './Meldeformular.css';
 import Navbar from '../components/Navbar';
@@ -123,6 +124,7 @@ export default function Meldeformular() {
   const [submitState,  setSubmitState]  = useState('idle');
   const [apiError,     setApiError]     = useState('');
   const [submissionId, setSubmissionId] = useState(null);
+  const navigate = useNavigate();
 
   const set = useCallback((key, value) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -145,6 +147,11 @@ export default function Meldeformular() {
     const e = {};
     if (!form.gender)                   e.gender         = 'Bitte wählen Sie ein Geschlecht.';
     if (!form.medical_history.trim())   e.medical_history= 'Grunderkrankung erforderlich.';
+    if (form.age !== '') {
+      const ageNum = Number(form.age);
+      if (!Number.isInteger(ageNum) || ageNum < 1 || ageNum > 119)
+        e.age = 'Alter muss zwischen 1 und 119 liegen.';
+    }
     if (form.hospitalized_abroad && !form.hospital_name.trim())
       e.hospital_name = 'Pflichtfeld wenn Auslandshospitalisierung aktiv.';
     setErrors(e);
@@ -260,7 +267,10 @@ export default function Meldeformular() {
             Ihre Meldung wurde per E-Mail weitergeleitet und wird nach fachlicher Prüfung übernommen.
           </p>
           {submissionId && <p className="success-id">Submission-ID: <strong>{submissionId}</strong></p>}
-          <button className="btn-secondary" onClick={reset}>Neue Meldung erstellen</button>
+          <div className="success-actions">
+            <button className="btn-primary" onClick={reset}>Neue Meldung erstellen</button>
+            <button className="btn-secondary" onClick={() => navigate('/')}>Zurück zum Dashboard</button>
+          </div>
         </div>
       </div>
     );
@@ -366,8 +376,9 @@ export default function Meldeformular() {
                   error={!!errors.gender}
                   options={[['male','männlich'],['female','weiblich'],['other','divers'],['intersex','intersex / inter'],['unknown','unbekannt']]} />
               </Field>
-              <Field id="age" label="Alter" hint="Optional, 1–119">
+              <Field id="age" label="Alter" hint="Optional, 1–119" error={errors.age}>
                 <input id="age" type="number" value={form.age} min="1" max="119"
+                  className={errors.age ? 'input-error' : ''}
                   onChange={(e) => set('age', e.target.value)} placeholder="z. B. 72" />
               </Field>
               <Field id="immune_status" label="Immunstatus" fullWidth

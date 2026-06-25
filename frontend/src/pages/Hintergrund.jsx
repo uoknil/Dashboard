@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Hintergrund.css';
 import Navbar from '../components/Navbar';
 
-// ─── Statische Daten ──────────────────────────────────────────
-const RESISTANCE = [
-  { label: 'Fluconazol (Azole)',     pct: 90, color: '#c0392b' },
-  { label: 'Voriconazol (Azole)',    pct: 75, color: '#e67e22' },
-  { label: 'Amphotericin B',         pct: 35, color: '#e67e22' },
-  { label: 'Echinocandine',          pct: 10, color: '#1D9E75' },
-];
-
+// ─── Statische Daten (löschen)──────────────────────────────────────────
 const KLINIK_ACCORDION = [
   { q: 'Manifestationsformen',
     a: 'Candidämie (Blutstrominfektion), Harnwegsinfektionen, Wundinfektionen sowie asymptomatische Kolonisation. Seltener Meningitis oder Endokarditis bei prädisponierten Patientengruppen.' },
@@ -104,10 +97,10 @@ function Accordion({ items }) {
 function TabErreger() {
   return (
     <>
-      <div className="stat-row">
-        <div className="stat-card"><div className="stat-val">2009</div><div className="stat-label">Erstbeschreibung in Japan</div></div>
-        <div className="stat-card"><div className="stat-val">6</div><div className="stat-label">Bekannte phylogenetische Clades</div></div>
-        <div className="stat-card"><div className="stat-val">&gt;60%</div><div className="stat-label">Mortalität bei invasiver Infektion</div></div>
+      <div className="info-stat-row">
+        <div className="info-stat-card"><div className="info-stat-val">2009</div><div className="info-stat-label">Erstbeschreibung in Japan</div></div>
+        <div className="info-stat-card"><div className="info-stat-val">6</div><div className="info-stat-label">Bekannte phylogenetische Clades</div></div>
+        <div className="info-stat-card"><div className="info-stat-val">&gt; 60%</div><div className="info-stat-label">Mortalität bei invasiver Infektion</div></div>
       </div>
       <div className="card">
         <div className="card-title">Was ist Candida auris?</div>
@@ -115,16 +108,6 @@ function TabErreger() {
           <p>Candida auris ist ein Hefepilz, der 2009 erstmals aus dem Gehörgang einer japanischen Patientin isoliert wurde. Er zeichnet sich durch ausgeprägte Resistenz gegenüber mehreren Antimykotika-Klassen, hohe Persistenz auf Oberflächen sowie rasche Ausbreitung in Gesundheitseinrichtungen aus.</p>
           <p>Die WHO stufte ihn 2022 als <strong>Critical Priority Fungal Pathogen</strong> ein — die höchste Dringlichkeitsstufe.</p>
         </div>
-      </div>
-      <div className="card">
-        <div className="card-title">Antimykotische Resistenzraten</div>
-        {RESISTANCE.map((r) => (
-          <div key={r.label} className="res-row">
-            <div className="res-label">{r.label}</div>
-            <div className="res-track"><div className="res-fill" style={{ width: `${r.pct}%`, background: r.color }} /></div>
-            <div className="res-val">{r.pct}%</div>
-          </div>
-        ))}
       </div>
       <div className="card">
         <div className="card-title">Klinik, Risikofaktoren & Prävention</div>

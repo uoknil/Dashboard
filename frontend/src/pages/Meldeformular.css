@@ -1,22 +1,17 @@
 .form-page {
-  max-width: 820px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1.5rem 1rem 3rem;
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
-/* .topbar {
-  background: #1a3a5c; color: #e8f0f8; padding: 12px 20px;
-  border-radius: 10px; margin-bottom: 1.25rem;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+
+/* Inhalt schmaler halten für bessere Lesbarkeit, Navbar bleibt 1100px breit */
+.form-page > *:not(.navbar) {
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
 }
-.topbar-title { font-size: 17px; font-weight: 500; }
-.topbar-nav   { display: flex; gap: 6px; }
-.nav-btn {
-  font-size: 12px; padding: 4px 12px; border-radius: 20px;
-  border: 0.5px solid rgba(255,255,255,0.3);
-  background: transparent; color: #9bb8d4; cursor: pointer;
-}
-.nav-btn-active { background: rgba(255,255,255,0.15); color: #e8f0f8; border-color: rgba(255,255,255,0.5); } */
+
 .info-banner {
   display: flex;
   gap: 10px;
@@ -479,4 +474,13 @@
   .step-label {
     display: none;
   }
+}
+
+/* Buttons auf dem Erfolgs-Screen */
+.success-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
 }

@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const { isAuthenticated, username, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Admin-Bereich = /admin oder /login. Überall sonst = öffentlich.
+  const isAdminArea = location.pathname.startsWith('/admin')
+    || location.pathname.startsWith('/login');
 
   function handleLogout() {
     logout();
@@ -43,7 +48,8 @@ export default function Navbar() {
           Dashboard
         </NavLink>
         <NavLink to="/meldung"
-          className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}
+          className={({ isActive }) =>
+            `navbar-link${isActive ? ' active' : ''}${isAdminArea ? '' : ' navbar-cta'}`}
           onClick={() => setMenuOpen(false)}>
           Fallmeldung
         </NavLink>
@@ -66,22 +72,14 @@ export default function Navbar() {
           </NavLink>
         )}
 
-        <div className="navbar-right">
-          {isAuthenticated ? (
-            <>
-              <span className="navbar-user">{username}</span>
-              <button className="navbar-logout" onClick={handleLogout}>
-                Abmelden
-              </button>
-            </>
-          ) : (
-            <NavLink to="/login"
-              className={({ isActive }) => `navbar-link navbar-login-btn${isActive ? ' active' : ''}`}
-              onClick={() => setMenuOpen(false)}>
-              Admin-Login
-            </NavLink>
-          )}
-        </div>
+        {isAuthenticated && (
+          <div className="navbar-right">
+            <span className="navbar-user">{username}</span>
+            <button className="navbar-logout" onClick={handleLogout}>
+              Abmelden
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

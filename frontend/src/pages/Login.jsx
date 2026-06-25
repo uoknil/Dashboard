@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { loginUser, forgotPassword } from '../services/api';
 import './Login.css';
-import Navbar from '../components/Navbar';
 import { useTranslation } from 'react-i18next';
 
 export default function Login() {

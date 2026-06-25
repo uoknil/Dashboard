@@ -429,19 +429,23 @@
 .modal-field input,
 .modal-field select,
 .modal-field textarea {
-  padding: 7px 9px;
-  border: 0.5px solid #e5e7eb;
+  padding: 8px 10px;
+  border: 1px solid #d8dce1;
   border-radius: 6px;
   font-size: 12.5px;
   font-family: inherit;
   color: #111827;
-  background: #fff;
+  background: #f8f9fa;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 .modal-field input:focus,
 .modal-field select:focus,
 .modal-field textarea:focus {
   outline: none;
   border-color: #2878b8;
+  background: #fff;
 }
 .modal-section-label {
   font-size: 11px;

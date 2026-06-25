@@ -236,8 +236,7 @@
   "form_date": "Date of isolation",
   "form_date_hint": "Format: \"YYYY-MM-DD\"",
   "form_site": "Isolation site",
-  "form_site_hint": "e.g. blood culture, urinary tract",
-  "form_site_ph": "e.g. blood culture …",
+  "form_site_ph": "e.g. blood culture, urinary tract",
   "form_inftype": "Infection type",
   "form_inftype_infection": "Manifest infection",
   "form_inftype_colonization": "Colonization",
@@ -456,5 +455,19 @@
   "admin_err_approve": "Error approving.",
   "admin_err_reject": "Error rejecting.",
   "admin_err_delete": "Error deleting.",
-  "admin_err_save": "Error saving."
+  "admin_err_save": "Error saving.",
+
+  "state_vienna": "Vienna",
+  "state_lower_austria": "Lower Austria",
+  "state_upper_austria": "Upper Austria",
+  "state_styria": "Styria",
+  "state_tyrol": "Tyrol",
+  "state_salzburg": "Salzburg",
+  "state_carinthia": "Carinthia",
+  "state_vorarlberg": "Vorarlberg",
+  "state_burgenland": "Burgenland",
+  "dash_case_singular": "case",
+  "dash_case_plural": "cases"
+
+  
 }

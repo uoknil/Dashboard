@@ -1,36 +1,34 @@
 import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next'; // 1. Import hinzugefügt
 import {
   ComposableMap,
   Geographies,
   Geography,
 } from '@vnedyalk0v/react19-simple-maps';
 
-// Liegt lokal in public/ — wird vom eigenen Server geladen, kein CORS-Problem
 const GEO_URL = '/austria-states.json';
-
-// gleiche Farbskala wie bei der Weltkarte / alten Karte
 const COLOR_SCALE = ['#d4e8f7', '#9fc7e8', '#5a9fd4', '#2878b8', '#1a3a5c'];
 
-// Backend liefert Bundesländer auf Englisch, die Geometrie auf Deutsch.
-// Diese Tabelle übersetzt Englisch → Deutsch (Geometrie-Namen).
-const STATE_EN_DE = {
-  'Vienna': 'Wien',
-  'Lower Austria': 'Niederösterreich',
-  'Upper Austria': 'Oberösterreich',
-  'Styria': 'Steiermark',
-  'Tyrol': 'Tirol',
-  'Salzburg': 'Salzburg',
-  'Carinthia': 'Kärnten',
-  'Vorarlberg': 'Vorarlberg',
-  'Burgenland': 'Burgenland',
+const STATE_CONFIG = {
+  'Vienna':           { geo: 'Wien',             key: 'state_vienna' },
+  'Lower Austria':    { geo: 'Niederösterreich', key: 'state_lower_austria' },
+  'Upper Austria':    { geo: 'Oberösterreich',   key: 'state_upper_austria' },
+  'Styria':           { geo: 'Steiermark',       key: 'state_styria' },
+  'Tyrol':            { geo: 'Tirol',            key: 'state_tyrol' },
+  'Salzburg':         { geo: 'Salzburg',         key: 'state_salzburg' },
+  'Carinthia':        { geo: 'Kärnten',          key: 'state_carinthia' },
+  'Vorarlberg':       { geo: 'Vorarlberg',       key: 'state_vorarlberg' },
+  'Burgenland':       { geo: 'Burgenland',       key: 'state_burgenland' },
 };
 
-// Baut aus { "Vienna": 5, ... } eine Map mit deutschen Namen { "Wien": 5, ... }
-function buildGermanCounts(stateData) {
+// Hilfsfunktion verwendet jetzt die neue Config
+function aggregateData(stateData) {
   const result = {};
   Object.entries(stateData).forEach(([enName, count]) => {
-    const deName = STATE_EN_DE[enName] || enName;
-    result[deName] = (result[deName] || 0) + count;
+    const config = STATE_CONFIG[enName];
+    if (config) {
+      result[config.geo] = (result[config.geo] || 0) + count;
+    }
   });
   return result;
 }
@@ -43,6 +41,7 @@ function getColor(value, max) {
 }
 
 export default function AustriaMapGeo({ stateData = {} }) {
+  const { t } = useTranslation(); // 2. Hook initialisiert
   const [geoData, setGeoData] = useState(null);
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
   const wrapperRef = useRef(null);
@@ -58,7 +57,8 @@ export default function AustriaMapGeo({ stateData = {} }) {
     return <div className="skeleton skeleton-map" />;
   }
 
-  const counts = buildGermanCounts(stateData);
+  // 3. Aufruf der richtigen Funktion
+  const counts = aggregateData(stateData);
   const max = Math.max(...Object.values(counts), 1);
 
   return (
@@ -92,11 +92,14 @@ export default function AustriaMapGeo({ stateData = {} }) {
                     hover:   { outline: 'none', fill: '#e6a817' },
                     pressed: { outline: 'none' },
                   }}
-                onMouseEnter={(e) => {
+                  onMouseEnter={(e) => {
                     const r = wrapperRef.current?.getBoundingClientRect();
+                    const entry = Object.values(STATE_CONFIG).find(c => c.geo === name);
+                    const transKey = entry ? entry.key : 'unknown';
+
                     setTooltip({
                       visible: true,
-                      text: `${name}: ${value} ${value === 1 ? 'Fall' : 'Fälle'}`,
+                      text: `${t(transKey)}: ${value} ${value === 1 ? t('dash_case_singular') : t('dash_case_plural')}`,
                       x: r ? e.clientX - r.left + 10 : 0,
                       y: r ? e.clientY - r.top - 30 : 0,
                     });

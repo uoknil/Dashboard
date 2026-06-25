@@ -452,5 +452,20 @@
   "admin_err_approve": "Fehler beim Genehmigen.",
   "admin_err_reject": "Fehler beim Ablehnen.",
   "admin_err_delete": "Fehler beim Löschen.",
-  "admin_err_save": "Fehler beim Speichern."
+  "admin_err_save": "Fehler beim Speichern.",
+
+  "state_vienna": "Wien",
+  "state_lower_austria": "Niederösterreich",
+  "state_upper_austria": "Oberösterreich",
+  "state_styria": "Steiermark",
+  "state_tyrol": "Tirol",
+  "state_salzburg": "Salzburg",
+  "state_carinthia": "Kärnten",
+  "state_vorarlberg": "Vorarlberg",
+  "state_burgenland": "Burgenland",
+  "dash_case_singular": "Fall",
+  "dash_case_plural": "Fälle"
+
+  
+  
 }

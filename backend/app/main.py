@@ -127,8 +127,10 @@ async def submit_case(report: schemas.CaseReport, background_tasks: BackgroundTa
 
     # DATABASE PROCESSING
     report_dict = report.model_dump()
+    # remove captcha token before saving to DB
     report_dict.pop("captcha_token", None)
 
+    # create a new Submission instance with the report data
     new_submission = models.Submission(**report_dict)
     db.add(new_submission)
     db.commit()
@@ -351,9 +353,6 @@ def get_stats_by_country(db: Session = Depends(get_db)):
 
     return {country: count for country, count in results}
 
-
-# ________________
-# Add to app/main.py
 
 # 1. READ ALL ADMINS (For the FE to display the table/list of users)
 @app.get("/api/admin/users", response_model=list[schemas.UserOut])

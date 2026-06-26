@@ -9,6 +9,7 @@ import Login             from './pages/Login';
 import Admin             from './pages/Admin';
 import About             from './pages/About';
 import ResetPassword     from './pages/ResetPassword';
+import Datenschutz from './pages/Datenschutz';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/login"   element={<Login />} />
           <Route path="/about"   element={<About />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
           <Route
             path="/admin"
             element={

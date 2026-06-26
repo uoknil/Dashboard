@@ -53,6 +53,7 @@
   "about_privacy_notice_text": "Die endgültige Datenschutzerklärung wird vor dem öffentlichen Go-Live durch die verantwortliche Organisation bereitgestellt und hier eingefügt.",
   "about_imp_attribution": "Datenquellen",
   "about_imp_attribution_text": "Kartengrundlage Bundesländer: ginseng666/GeoJSON-TopoJSON-Austria, basierend auf Statistik Austria, CC BY 4.0.",
+  "about_privacy_link": "Zur Datenschutzerklärung",
   
   "dash_title": "Candida auris Surveillance Dashboard · Österreich",
   "dash_sub": "Aggregierte, anonymisierte Falldaten auf Bundeslandebene",
@@ -312,7 +313,7 @@
   "form_err_travel": "Reiseanamnese ist Pflicht (ggf. \"Keine Auslandsreise\").",
   "form_err_gender": "Bitte wählen Sie ein Geschlecht.",
   "form_err_medical": "Grunderkrankung erforderlich.",
-  "form_err_age": "Alter muss zwischen 1 und 119 liegen.",
+  "form_err_age": "Alter muss zwischen 0 und 119 liegen.",
   "form_err_hospital": "Pflichtfeld wenn Auslandshospitalisierung aktiv.",
   "form_err_email": "Gültige E-Mail-Adresse erforderlich.",
   "form_err_antifungal": "Details zur antimykotischen Therapie erforderlich.",

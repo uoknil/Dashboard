@@ -207,3 +207,18 @@
 .about-notice strong {
   color: #1a3a5c;
 }
+.about-notice-link {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #2878b8;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.about-notice-link:hover {
+  color: #1a3a5c;
+}

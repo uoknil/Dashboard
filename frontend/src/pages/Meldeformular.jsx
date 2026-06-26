@@ -152,7 +152,7 @@ export default function Meldeformular() {
     if (!form.medical_history.trim())   e.medical_history= t('form_err_medical');
     if (form.age !== '') {
       const ageNum = Number(form.age);
-      if (!Number.isInteger(ageNum) || ageNum < 1 || ageNum > 119)
+      if (!Number.isInteger(ageNum) || ageNum < 0 || ageNum > 119)
         e.age = t('form_err_age');
     }
     if (form.hospitalized_abroad && !form.hospital_name.trim())

@@ -11,7 +11,7 @@ class CaseReport(BaseModel):
 
     reporter_email: EmailStr
 
-    age: Optional[int] = Field(None, gt=0, lt=120)
+    age: Optional[int] = Field(None, ge=0, lt=120)
     gender: GenderType
     # reason for visit, i guess? or maybe "comorbidities" or "underlying conditions"?
     medical_history: str = Field(..., min_length=1)

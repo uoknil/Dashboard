@@ -1,0 +1,27 @@
+.datenschutz-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+.datenschutz-card {
+  background: #fff;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 28px 30px;
+  line-height: 1.7;
+  color: #374151;
+}
+.datenschutz-card h1 {
+  font-size: 22px;
+  color: #1a3a5c;
+  margin-bottom: 20px;
+}
+.datenschutz-card h2 {
+  font-size: 16px;
+  color: #1a3a5c;
+  margin: 22px 0 8px;
+}
+.datenschutz-card p {
+  margin-bottom: 12px;
+}

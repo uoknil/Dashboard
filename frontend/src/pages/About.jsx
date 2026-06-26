@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useTranslation } from 'react-i18next';
 import './About.css';
@@ -56,6 +57,7 @@ function LogoSlot({ src, alt, fallbackLabel }) {
 
 export default function About() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div className="about-page">
       <Navbar />
@@ -139,6 +141,10 @@ export default function About() {
         <div className="about-notice" style={{ marginTop: 14 }}>
         <strong>{t('about_privacy_notice_title')}</strong><br />
         {t('about_privacy_notice_text')}
+        <br />
+        <button className="about-notice-link" onClick={() => navigate('/datenschutz')}>
+          {t('about_privacy_link')}
+        </button>
       </div>
       </div>
     </div>

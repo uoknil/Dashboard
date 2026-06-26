@@ -7,12 +7,15 @@
 // Wenn die nicht existiert, fällt es auf localhost:8000 zurück
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// Die zentrale request()-Funktion. (privat, kein export)
-// Nur die Funktionen unten benutzen sie
+// Die zentrale request()-Funktion.
+// Logik für die
+// 1. Authentifizierung, Fehlerbehandlung
+// Kommunikation nach dem Login
 // Sie macht automatisch
-// 1. Token aus localStorage holen
+// 1. Token aus localStorage holen und einfügen
 // 2. als Bearer-Header anhängen
-// 3. Fehler als Exception werfen, mit HTTP-Status
+// 3. Führt eine HTTP-Anfrage aus
+// $. Wirft Fehler als Exception, mit HTTP-Status
 async function request(path, options = {}) {
   const token = localStorage.getItem('cauris_token');
 
@@ -37,23 +40,17 @@ async function request(path, options = {}) {
 }
 
 // 2. LOGIN
+// 1. Benutzer gibt Daten in ein Formular ein
+// const data = await loginUser(u, p) wird aufgerufen
+// das Ergebnis wird gespeichert: localStorage.setItem('cauris_token', data.token)
+// nun kann man request-Funktion nutzen,
+// und auf geschützte Bereiche zugreifen
 
-// URLSearchParams statt JSON
-// FastAPIs 0Auth2PasswordRequestForm erwartet 
-// username=admin&password=geheim als Form-Daten,
-// nicht { "username":"admin"} als JSON
-// URLSearchParams baut dieses Format automatisch
 export async function loginUser(username, password) {
   const body = new URLSearchParams();
   body.append('username', username);
   body.append('password', password);
 
-  // Kein Content-Type Header nötig
-  // Wenn der Body ein URLSearchParams-Objekt ist,
-  // setzt der Browser den Content-Type automatisch auf
-  // application/x-www-form-urlencoded
-  // Würde man ihn manuell auf application/json setzen
-  // würde FastAPI den Request ablehnen
   const res = await fetch(`${BASE}/api/auth/login`, {
     method: 'POST',
     body,
@@ -70,10 +67,9 @@ export async function loginUser(username, password) {
 
 // 3. ÖFFENTLICHE ENDPUNKTE
 
-// Die Dashboard-Daten, alle einzeilig
+// Die Dashboard-Daten werden aufgerufen
 // sie rufen request() mit dem jeweiligen Pfad auf
 // Kein Token nötig, da die Endpunkte im Backend öffentlich sind
-// Antwort kommt als JS-Objekt zurück
 export const fetchStatsByState = () => request('/api/stats/by-state');
 export const fetchStatsBySite = () => request('/api/stats/by-site');
 export const fetchStatsByClade = () => request('/api/stats/by-clade');
@@ -82,10 +78,8 @@ export const fetchStatsByCountry = () => request('/api/stats/by-country');
 export const fetchLastUpdated = () => request('/api/meta/last-updated');
 
 // Fallmeldung absenden
-// hier ist JSON nötig
-// POST /api/report-case erwartet ein JSON-Objekt (nicht FormData)
-// JSON.stringify(payload) wandelt das JS-Objekt in JSON-String um
-// Content-Type application/json kommt automatisch aus der request()-Funktion
+// Daten an Backend übermitteln (POST)
+// Server empfängt das JSON
 export const submitCase = (payload) =>
   request('/api/report-case', {
     method: 'POST',
@@ -96,8 +90,7 @@ export const submitCase = (payload) =>
 
 // Die Admin-Funktionen
 // Der Token wird automatisch von request() mitgeschickt
-// das ${id} in den URLs ist Template-Syntax
-// es fügt die ID direkt in den Pfad ein: z.B. /api/admin/cases/42
+// das ${id} fügt die ID direkt in den Pfad ein: z.B. /api/admin/cases/42
 export const fetchCases = () => request('/api/admin/cases');
 export const fetchSubmissions = () => request('/api/admin/submissions');
 

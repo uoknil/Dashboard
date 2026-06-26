@@ -53,6 +53,7 @@
   "about_privacy_notice_text": "The final privacy policy will be provided by the responsible organization before the public go-live and inserted here.",
   "about_imp_attribution": "Data sources",
   "about_imp_attribution_text": "State boundary map data: ginseng666/GeoJSON-TopoJSON-Austria, based on Statistik Austria, CC BY 4.0.",
+  "about_privacy_link": "To the privacy policy",
 
   "dash_title": "Candida auris Surveillance Dashboard · Austria",
   "dash_sub": "Aggregated, anonymized case data at the state level",

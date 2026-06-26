@@ -40,7 +40,7 @@ class CaseReport(BaseModel):
     # e.g., CLade I, Clade II, Clade III, Clade IV, etc.
     # clade: Optional[str] = None
     # e.g., "South Asian", "African" "South American", etc.
-    # clade_region: Optional[str] = "Unknown" # i am not sure we should have this fiels in the formular.
+    # clade_region: Optional[str] = "Unknown"
 
     mic_and: Optional[float] = Field(None, ge=0)  # Anidulafungin
     mic_mic: Optional[float] = Field(None, ge=0)  # Micafungin
@@ -169,7 +169,6 @@ class SubmissionUpdate(BaseModel):
         from_attributes = True
 
 # for staging
-# Add to the bottom of app/schemas.py
 
 
 class UserCreate(BaseModel):

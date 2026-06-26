@@ -195,7 +195,7 @@ export default function Meldeformular() {
       travel_history: form.travel_history,
       infection_type: form.infection_type,
       captcha_token: captchaToken,
-      ...(form.age !== '' && parseInt(form.age) > 0 && parseInt(form.age) < 120
+      ...(form.age !== '' && Number.isInteger(Number(form.age)) && Number(form.age) >= 0 && Number(form.age) <= 119
           ? { age: parseInt(form.age) } : {}),
       ...(form.immune_status ? { immune_status: form.immune_status } : {}),
       ...(form.additional_info.trim() ? { additional_info: form.additional_info } : {}),
@@ -367,7 +367,7 @@ export default function Meldeformular() {
                   options={[['male',t('form_gender_male')],['female',t('form_gender_female')],['other',t('form_gender_divers')],['intersex',t('form_gender_inter')],['unknown',t('form_unknown')]]} />
               </Field>
               <Field id="age" label={t('form_age')} error={errors.age}>
-                <input id="age" type="number" value={form.age} min="1" max="119"
+                <input id="age" type="number" value={form.age} min="0" max="119"
                   className={errors.age ? 'input-error' : ''}
                   onChange={(e) => set('age', e.target.value)} placeholder={t('form_age_ph')} />
               </Field>
